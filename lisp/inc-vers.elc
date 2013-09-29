@@ -1,0 +1,26 @@
+
+(setq version-file nil)
+
+(setq temp (mapcar (quote (lambda (dir) (cons dir (file-exists-p (expand-file-name "version.el" dir))))) load-path))
+
+(while temp (and (cdr (car temp)) (null version-file) (setq version-file (expand-file-name "version.el" (car (car temp))))) (setq temp (cdr temp)))
+
+(insert-file-contents version-file)
+
+(re-search-forward "emacs-version \"[^\"]*[0-9]+\"")
+
+(forward-char -1)
+
+(save-excursion (save-restriction (narrow-to-region (point) (progn (skip-chars-backward "0-9") (point))) (goto-char (point-min)) (let ((version (read (current-buffer)))) (delete-region (point-min) (point-max)) (prin1 (1+ version) (current-buffer)))))
+
+(skip-chars-backward "^\"")
+
+(message "New Emacs version will be %s" (buffer-substring (point) (progn (skip-chars-forward "^\"") (point))))
+
+(write-region (point-min) (point-max) version-file nil (quote nomsg))
+
+(erase-buffer)
+
+(set-buffer-modified-p nil)
+
+(kill-emacs)

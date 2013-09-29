@@ -1,0 +1,1928 @@
+\kanjifiletype=20
+\overfullrule=0pt
+\input texinfo @c -*-texinfo-*-
+@comment %**start of header
+@setfilename nemacs
+@settitle Nemacs Version 3.3
+@comment %**end of header
+
+@titlepage
+@sp 10
+@center @titlefont{Nemacs Version 3.3 マニュアル}
+@sp 4
+@center  １９９０年６月
+@sp 4
+@center  錦見 美貴子
+@end titlepage
+@synindex vr fn
+
+@node Top, NemacsUsers, (dir), (dir)
+@comment  node-name,  next,  previous,  up
+
+@menu
+* NemacsUsers::	       ユーザーズマニュアル
+* NemacsLispers::      EmacsLispの拡張
+* (EGG)::              日本語入力ツール
+@end menu
+
+@node NemacsUsers, 概説 , , Top
+
+@menu
+* Overview: 概説.              Nemacsってどんなもの？
+* Jcode: 日本語文字コード.     Nemacsがどう日本語文字コード体系を扱うか
+* Functions: 機能.	       Nemacs特有の機能
+* Misc: その他.                Nemacsに関するさまざまな情報
+* (EGG)::                      日本語入力ツール
+* NemacsLispers::              EmacsLispの拡張
+* Commands: コマンド一覧.
+* Concepts: 概念索引.
+* Functions&Variables: 関数・変数索引.
+
+各ノードの下位ノード
+
+日本語文字コード
+* Jsystems: 日本語文字コード体系.  さらに日本語コードについて
+* Buffer: バッファ管理.            Nemacsはバッファをどう扱うか
+* Input: キーボード入力.           日本語キーボード入力
+* Display: ディスプレイ表示.       日本語の表示
+* FileI/O: ファイル入出力.         日本語を含むファイルの取り扱い
+* Process: プロセス間通信.         日本語を含むプロセス間通信
+
+機能
+* Jcodefunc: 日本語文字コードを扱う関数. 日本語文字コード体系に関する関数
+* Jtextfunc: 日本語文書編集機能. 文書編集の機能
+* Enhancemnet: 日本語処理のための拡張.
+
+その他
+* Documents: ドキュメント.  ドキュメントの在処
+* Keymaps: キーマッピング.  キーマップの変更点
+
+NemacsLispers
+* Marker: マーカの拡張.
+* Attribute: 属性の付与.
+
+GNU Emacsからの変更点（拡張点は除きます）
+* Search:  探索.             正規表現が拡張され一部変更されています
+* Keymaps: キーマッピング. ispell-wordとinsert-parentheseのキーが変更されています
+@end menu
+
+@node 概説, 日本語文字コード, NemacsUsers, NemacsUsers
+@chapter Nemacs Version 3.3
+@cindex Nemacs
+
+Nemacs は GNU Emacsに基づく日本語エディタです．Nemacs は GNU
+Emacs/Nemacsへのパッチの形で配布されています．最新版はNemacs Ver.3.3.2
+(1990.6.6) で, Nemacs 3.3.1 へのパッチです． @refill
+
+Nemacsの特徴は次の３つです．
+@itemize @bullet
+@item
+Nemacsは漢字かな混じり文，つまり普通の日本語の文をバッファに保持でき，ス
+クリーンに表示できます．さらに日本語文を編集するための機能を提供します．
+@item
+ファイル入出力，プロセス間通信, スクリーン表示，キーボード入力のそれぞれ
+について独立に日本語文字コード体系を設定できます．使用できるコード体系は
+JIS, シフトJIS, EUCの３つです．
+@item
+日本語モードでない場合には，オリジナルのGNU Emacsと同様に使えます．
+@end itemize
+
+Nemacsのチュトリアルはコマンド@kbd{C-h T}
+(@strong{help-with-tutorial-for-nemacs})で起動できます．Nemacsのバージョ
+ンは@strong{nemacs-version}で，最近の変更点は@strong{view-nemacs-news}で
+知ることができます．@refill 
+
+@noindent
+コマンド：
+@deffn Command help-with-tutorial-for-nemacs
+Nemacsの日本語版チュトリアルを起動する．
+@end deffn
+@deffn Command view-nemacs-news
+Nemacsの最新の変更点を表示する.
+@end deffn
+@deffn Command nemacs-version
+Nemacsのバージョンを表示する．
+@end deffn
+
+@node 日本語文字コード,日本語文字コード体系, 概説, NemacsUsers
+@chapter 日本語文字コードの体系
+@cindex 漢字[かんじ]
+@cindex バッファ漢字コード[ばっふぁかんじこーど]
+@cindex ファイル漢字コード[ふぁいるかんじこーど]
+@cindex プロセス漢字コード[ぷろせすかんじこーど]
+@cindex ディスプレイ漢字コード [でぃすぷれいかんじこーど]
+@cindex キーボード漢字コード[きーぼーどかんじこーど]
+
+Nemacsのバッファは，日本語モードで日本語を扱うことができます．日本語モー
+ドにするには，コマンド@kbd{C-x C-k t}（@strong{toggle-kanji-flag}）で変
+数@code{kanji-flag}を @kbd{t} にします．変数@code{kanji-flag}のデフォー
+ルト値は変数@code{default-kanji-flag}に保持され，コマンド@kbd{C-x C-k T}
+（@strong{toggle-default-kanji-flag}）で設定できます．@refill
+
+Nemacs は３種類の日本語文字コード体系を取り扱うことができます．使用でき
+る日本語文字コード体系はJIS, シフトJIS, EUCです．日本語文字コード体系の
+ことを漢字コード，あるいは単にコードと呼ぶことがあります．Nemacsは，日本
+語文書の内部表現（バッファ漢字コード）としてEUCコードを使っています．
+
+@noindent
+定義:
+@table @strong
+@item バッファ漢字コード
+Nemacsがバッファの内部表現として用いるコード体系（EUC）
+@item ファイル漢字コード
+文書ファイルで用いられているコード体系
+@item プロセス漢字コード
+Nemacsと外部プロセスの通信に用いられるコード体系
+@item ディスプレイ漢字コード
+Nemacsが端末表示用に送信するコード体系
+@item キーボード漢字コード
+Nemacsがキーボード入力として予期しているコード体系
+@end table
+
+@noindent
+変数:
+@defvr {Local Variable}  kanji-flag
+@table @asis
+@item nil
+日本文字コードへの変換や日本語表示を行なわない．GNU Emacsと同じ.
+@item t
+日本語文字コードへの変換，日本語表示を行なう．
+@end table
+@end defvr
+@defvr {Global Variable} default-kanji-flag
+kanji-flagのデフォールト値．
+@end defvr
+@noindent
+
+コマンド:
+@deffn Command toggle-kanji-flag
+@kbd{kanji-flag}の値を，@kbd{t}から@kbd{nil}，@kbd{nil}から@kbd{t}に切替
+える．
+@end deffn
+@deffn Command toggle-default-kanji-flag
+@kbd{default-kanji-flag}の値を，@kbd{t}から@kbd{nil}，@kbd{nil}から
+@kbd{t}に切替える．
+@end deffn
+
+@menu
+* Jsystems: 日本語文字コード体系.  さらに日本語コードについて
+* Buffer: バッファ管理.            Nemacsはバッファをどう扱うか
+* Input: キーボード入力.	   日本語キーボード入力
+* Display: ディスプレイ表示.       日本語の表示
+* FileI/O: ファイル入出力.	   日本語を含むファイルの取り扱い
+* Process: プロセス間通信.	   日本語を含むプロセス間通信
+@end menu
+
+@node 日本語文字コード体系, バッファ管理, 日本語文字コード,日本語文字コード
+@section 日本語文字コード体系
+@cindex 漢字コード[かんじこーど]
+@cindex 日本語文字コード[にほんごもじこーど]
+@cindex EUC コード[EUCこーど]
+@cindex JIS コード[JISこーど]
+@cindex シフトJIS コード[しふとJISこーど]
+
+通信用日本語文字コードはJIS (日本工業規格）6226で定められていますが，現
+在以下の３種類のコード体系が共存して使用されています．
+
+@itemize @bullet
+@item
+7bit JIS コード
+@item
+8bit シフトJIS コード
+@item
+8bit EUC コード
+@end itemize
+
+JISコードは７ビットであり，ネットワーク経由の通信プロセス（電子メイルな
+ど）は８ビットを通さないことが多いため，ネットワーク経由で他の計算機と通
+信を行なうようなプログラムに多用されています．また，計算機と日本語端末間
+のシリアルライン通信にも広く用いられています．
+
+シフトJISコードとEUCコードは，日本語をサポートするOSのほとんどにおいて，
+文書ファイルのコードやアプリケーションプログラムの内部表現として使われて
+います．
+
+つまり，JISコードの電子メイルを受け取り，それをファイルにしまうためにシ
+フトJISに変換し，さらに端末に表示するためにまたJISコードに戻すといった操
+作が日常的に行なわれるわけです．このような現実に対応するため，Nemacsでは
+次の４種類の処理に対して独立のコードを設定できるようになっています．
+
+@itemize @bullet
+@item
+ファイル入出力
+@item
+プロセス間通信
+@item
+ディスプレイ表示
+@item
+キーボード入力
+@end itemize
+
+これらの処理にそれぞれどのコードが設定されているかは，@kbd{C-x C-k C}
+(@strong{list-kanji-code})または@kbd{C-x C-k c}
+(@strong{list-kanji-code-briefly})で知ることができます．@refill
+
+@noindent
+コマンド:
+@deffn Command list-kanji-code
+@code{*Kanji Codes*}というバッファを作り，そこに日本語文字コード体系に関する変
+数を表示する．
+@end deffn
+@deffn Command list-kanji-code-briefly
+ミニバッファに日本語文字コード体系に関する変数を表示する．
+@end deffn
+
+@node バッファ管理, バッファ生成, 日本語文字コード体系, 日本語文字コード
+@section Nemacsのバッファ
+@cindex バッファ[ばっふぁ]
+@cindex alphanumerics
+Nemacsのバッファには，２バイトの日本語文字とASCIIのような１バイト文字が
+共存できます．日本語文字とはEUC，JIS，シフトJISのいずれかのコード体系に
+含まれている文字を指します．１バイト文字をalphanumericsと呼びます．（注
+意：２バイト日本語文字中の英数字とalphanumericsは別のものです．）
+
+@menu
+* Internal:	 内部表現.  Nemacsのバッファはどう表現されるか
+* BufferGen: 	バッファ生成. バッファ生成時に何をするか
+@end menu
+
+@node 内部表現, バッファ生成, バッファ管理, バッファ管理
+@subsection 日本語文字の内部表現
+@cindex バッファ内部表現[ばっふぁないぶひょうげん]
+
+Nemacsのバッファは８ビット文字のアレイとして表現されます．alphanumericは
+８ビットで表され，日本語文字のコードは２つの連続する８ビットを用いて表さ
+れています．@*
+
+alphanumeric の内部表現は@kbd{0XXXXXXX}（alphanumeric１文字は７ビットで
+表現できる），@*日本語文字の内部表現は@kbd{1XXXXXXX 1XXXXXXX}です．
+
+@node バッファ生成, キーボード入力, 内部表現, バッファ管理
+@subsection バッファ生成
+@cindex バッファ生成[ばっふぁせいせい]
+@cindex モードライン[もーどらいん]
+
+  新規バッファ生成時には，Nemacsはバッファの変数@code{kanji-flag}に変数
+@code{default-kanji-flag}の値を設定します.
+@refill
+
+変数@code{kanji-flag}が @kbd{t}の時，つまりコード変換を行ない日本語を表
+示する時には, モードラインの右端に以下のような漢字コードニーモニックが現
+れます．@refill
+
+@example
+--**-NEmacs: Nemacs.text (Text)--Top-- [-JJN]---
+                                        ^^^^
+@end example
+
+表示されるコードは左から順に
+@table @asis
+@item kanji-fileio-code
+ファイル入出力に用いられるコード（@pxref{ファイル入出力}）
+@item kanji-input-code
+キーボード入力として予期しているコード（@pxref{キーボード入力}）
+@item kanji-display-code
+端末表示に用いているコード（@pxref{ディスプレイ表示}）
+@item process-kanji-code
+バッファプロセスとの通信に用いているコード（@pxref{プロセス間通信}）
+@end table
+です．
+
+またニーモニックはそれぞれ
+@table @asis
+@item -
+未設定
+@item N
+無変換
+@item J
+JISコード
+@item S
+シフトJISコード
+@item E
+EUCコード
+@end table
+を表します．
+
+@noindent
+@ifinfo
+変数:
+@defvr {Local Variable}  kanji-flag
+@table @asis
+@item nil
+漢字コードへの変換や日本語表示を行なわない．GNU Emacsと同じ.
+@item t
+漢字コードへの変換，日本語表示を行なう．
+@end table
+@end defvr
+@defvr {Global Variable} default-kanji-flag
+kanji-flagのデフォールト値.
+@end defvr
+@end ifinfo
+
+@node キーボード入力, ディスプレイ表示, バッファ管理, 日本語文字コード
+@section キーボード入力
+@cindex キーボード入力[きーぼーどにゅうりょく]
+
+キーボードから日本語を入力するには，３種類の日本語文字コードのうち一つを
+使います．どのコードを使いたいかはあらかじめNemacsに教えてやる必要があり
+ます．これはコマンド@strong{set-kanji-input-code}を呼ぶことによって行な
+えます．@kbd{C-x C-k i}（コマンド@strong{change-input-code}）を使うこと
+もできます．
+@refill
+
+選択したコードは@code{kanji-input-code}の値として保持され，Nemacsは入力
+をそのコードだと思って受け取り，内部コード（EUC）に変換します．１つの日
+本語文字は２バイトで表現されるので，Nemacsは日本語コードの最初の１バイト
+を次のバイトが来るまで取っておき，２バイト揃ったところで内部コードに変換
+してバッファに挿入します．@refill
+
+JISコードを使う時には，２種類のエスケープシークエンス（通常@kbd{ ESC $
+@@ }と @kbd{ ESC ( J }を使います）によって，日本語文字とalphanumericの切替
+えを行ないます.  これらのエスケープシークエンスはそれぞれコマンド
+@strong{kanji-jis-start}と @strong{kanji-jis-end}を起動するキーシークエ
+ンスです．@refill
+
+コマンド@strong{jis-code-input}を呼ぶと，16進表現のJISコードによる入力ができ
+ます．ミニバッファにコードを入力して@kbd{RET}キーを押して下さい．ポイン
+トの位置に対応する文字が挿入されます．
+
+@noindent
+変数:
+@defvr {Global Variable} kanji-input-code
+Nemacsがキーボード入力として予期しているコード体系
+@table @asis
+@item  0
+無変換
+@item  1
+シフトJISコード
+@item 2
+JISコード
+@item 3
+EUCコード
+@end table
+@end defvr
+
+@noindent
+コマンド:
+@deffn Command set-kanji-input-code CODE
+kanji-input-codeをCODEに設定する．CODEは，
+@table @asis
+@item  0 または 'noconv または "NOCONV"
+無変換
+@item  1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item  2 または 'JIS または "JIS"
+JISコード
+@item  3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+@deffn Command kanji-jis-start
+フラグ@kbd{kanji-JIS-flag}を@kbd{t}にする．
+@end deffn
+@deffn Command kanji-jis-end
+フラグ@kbd{kanji-JIS-flag}を@kbd{nil}にする．
+@end deffn
+@deffn Command change-input-code
+@code{kanji-input-code}の値を次の順序で切替える．@* NIL（未設定）→0（無
+変換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+@end deffn
+@deffn Command jis-code-input
+jisコードによる直接入力．
+@end deffn
+
+@node ディスプレイ表示, ファイル入出力, キーボード入力, 日本語文字コード
+@section ディスプレイへの表示
+@cindex ディスプレイ表示 [でぃすぷれいひょうじ]
+@cindex 表示[ひょうじ]
+@cindex フォント[ふぉんと]
+
+Nemacsは，変数@code{kanji-display-code}の値で指定されたコードに日本語文
+字を変換してディスプレイに送ります．変数@code{kanji-display-code}はコマ
+ンド@strong{set-kanji-display-code}を呼ぶことで設定できます．@kbd{C-x
+C-k d} (@strong{change-display-code})を使うこともできます． @refill
+
+Nemacsは日本語文字のフォントとしてalphanumericのフォントと同じ高さで２倍
+の幅を持つものを使います．つまり，２バイトコードは１バイトコードのちょう
+ど２倍の幅を持つわけです．@*
+
+@noindent
+変数:
+@defvr {Global Variable} kanji-display-code
+Nemacsが端末表示用に送信するコード体系
+@table @asis
+@item  0
+無変換
+@item  1
+シフトJISコード
+@item 2
+JISコード
+@item 3
+EUCコード
+@end table
+@end defvr
+@defvr {Global Variable} to-ascii-display
+（JISコードが選択されている場合のみ有効）ディスプレイにASCII文字を送るよ
+うに切替えるエスケープシークエンスの最後の文字．
+@end defvr
+@defvr {Global Variable} to-kanji-display
+（JISコードが選択されている場合のみ有効）ディスプレイに日本語文字を送る
+ように切替えるエスケープシークエンスの最後の文字．
+@end defvr
+
+@noindent
+コマンド:
+@deffn Command set-kanji-display-code CODE
+@kbd{kanji-display-code}をCODEに設定する.
+@table @asis
+@item  0 または 'noconv または "NOCONV"
+無変換
+@item  1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item  2 または 'JIS または "JIS"
+JISコード
+@item  3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+@deffn Command change-display-code
+@kbd{kanji-display-code}の値を次の順序で切替える．@* NIL（未設定）→0
+（無変換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+@end deffn
+@deffn Command x-set-kfont
+X windowで使用する日本語文字フォントを設定する．
+@end deffn
+
+@node ファイル入出力, プロセス間通信, ディスプレイ表示, 日本語文字コード
+@section ファイルの読み書き
+@cindex ファイル入出力[ふぁいるにゅうしゅつりょく]
+
+Nemacsの各バッファは２つの変数@code{kanji-flag}と
+@code{kanji-fileio-code}を持ちます.  １つめの@code{kanji-flag}はそのバッ
+ファが日本語文字を含むかどうかを示します．つまり@code{kanji-flag}がnilな
+らば， Nemacsは日本語文字があらわれないと思い，基本的にGNU Emacsと同じよ
+うに振舞います.この場合にはNemacsを用い
+て８ビットデータの編集ができます．@refill
+
+２つめの変数@code{kanji-fileio-code}は， Nemacsがファイルの読み書きに使
+う日本語文字コード体系を示します．この変数は関数
+@strong{set-kanji-fileio-code}や@strong{change-fileio-code}(@kbd{C-x C-k
+f})によって設定できます．デフォルト値は@code{default-kanji-fileio-code}
+に保持され，関数
+@kbd{set-default-fileio-code},@kbd{change-default-fileio-code}(@kbd{C-x
+C-k F})によって変更可能です．@refill
+
+Nemacsはファイルを読む時にはファイルが@code{kanji-fileio-code}によって指
+定されるコードで書かれているものとして読み込み，またファイルに文書を書き
+出す前には文書を@code{kanji-fileio-code}
+で指定されるコードに変換します．@refill 
+
+@noindent
+変数:
+@ifinfo
+@defvr {Local Variable}  kanji-flag
+@table @asis
+@item nil
+漢字コードへの変換や日本語表示を行なわない．GNU Emacsと同じ.
+@item t
+漢字コードへの変換，日本語表示を行なう．
+@end table
+@end defvr
+@end ifinfo
+@defvr {Local Variable} kanji-fileio-code
+ファイル入出力に用いられるソース／ターゲット漢字コード．ファイル入力時に
+は，@code{kanji-expected-code}がnilの場合にのみ使用される．
+@table @asis
+@item nil
+未設定
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+@defvr {Global Variable} default-kanji-fileio-code
+バッファの変数@code{kanji-fileio-code}のデフォールト値
+@table @asis
+@item 	nil
+未設定
+@item  0
+無変換
+@item  1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+@defvr {Global Variable} to-ascii-fileio
+ASCII文字を選択するエスケープシーケンスの最後の文字（JISコードが選ばれて
+いる時のみ有効） @refill
+@end defvr
+@defvr {Global Variable} to-kanji-fileio
+日本語文字を選択するエスケープシーケンスの最後の文字（JISコードが選ばれ
+ている時のみ有効） @refill
+@end defvr
+
+@noindent
+コマンド:
+@deffn Command set-kanji-fileio-code CODE
+@code{kanji-fileio-code}の値をCODEに設定する．CODEは以下のいずれか．
+@table @asis
+@item 	nil
+未設定
+@item  0 または 'noconv または "NOCONV"
+無変換
+@item  1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item  2 または 'JIS または "JIS"
+JISコード
+@item  3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+@deffn Command change-fileio-code
+@kbd{kanji-fileio-code}の値を次の順序で切替える．NIL（未設定）→0（無変
+換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+@end deffn
+@deffn Command set-default-fileio-code CODE
+@code{default-kanji-fileio-code}の値をCODEに設定する．CODEは以下のいずれ
+か．
+@table @asis
+@item 	nil
+未設定
+@item  0 または 'noconv または "NOCONV"
+無変換
+@item  1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item  2 または 'JIS または "JIS"
+JISコード
+@item  3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+@deffn Command change-default-fileio-code
+@code{default-kanji-fileio-code}の値を次の順序で切替える．@* NIL（未設定）
+→0（無変換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+@end deffn
+
+@menu
+* FileInput:	 ファイル入力.  入力時にコード体系をどう決めるか.
+* FileOutput:   ファイル出力. 出力時に何をするか.
+@end menu
+
+@node ファイル入力, ファイル出力, ファイル入出力, ファイル入出力
+@subsection ファイル入力
+@cindex ファイル入力[ふぁいるにゅうりょく]
+@cindex ファイル漢字コード[ふぁいるかんじこーど]
+
+バッファの変数@code{kanji-flag}の値がtの時は，Nemacsはそのバッファに読み
+込まれるファイルは漢字コードを含むことを期待します．Nemacsは３種類の漢字
+コードを知っているので，入力されるファイルが３つのうちのどのコードで書か
+れているかを調べなければなりません．入力ファイルが書かれているコードをそ
+のファイルの@strong{ファイル漢字コード}と呼びます． @refill
+
+Nemacsは変数@code{kanji-expected-code}と変数 @code{kanji-fileio-code}に
+したがって@strong{ファイル漢字コード}を決定します．これらの変数は関数
+@strong{set-kanji-expected-code}と関数@strong{set-kanji-fileio-code}によっ
+て設定することができます．@refill
+
+@strong{ファイル漢字コード}は次のようにして決められます．
+
+変数@code{kanji-expected-code}が @kbd{nil} でも@kbd{t} でもなければ，その値
+が@strong{ファイル漢字コード}として使われます．@refill
+
+変数@code{kanji-expected-code}が @kbd{nil} でかつ変数
+@code{kanji-fileio-code}が @kbd{nil} 以外ならば，
+@code{kanji-fileio-code}の値が@strong{ファイル漢字コード}
+となります．@refill
+
+変数@code{kanji-expected-code}が @kbd{t}，あるいは
+@code{kanji-expected-code}と @code{kanji-fileio-code} が両方とも 
+@kbd{nil} ならば，Nemacsはファイルを調べ，使われているコード体系を推測し
+，それを@strong{ファイル漢字コード}とします．@refill
+
+この際@code{kanji-expected-code}が@kbd{nil}ならば，推測したコー
+ドを@code{kanji-fileio-code}に設定します．変数@code{kanji-fileio-code}の
+値として可能な日本語文字コード体系の意味は以下の通りです． @refill @*
+@noindent
+@table @asis
+@item nil
+無設定
+@item 0
+バッファ漢字コードと同じ（無変換）
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+
+@menu
+* File-insertion: ファイルの挿入. 既存バッファに挿入する場合のコード
+* Read-in: 漢字ファイルの読み込み. コード体系をを読み込み時に指定する
+* Find-new-file: 新規ファイル作成時. ファイル作成時のコード
+@end menu
+
+@node ファイルの挿入, 漢字ファイルの読み込み, ファイル入力, ファイル入力 
+@subsubsection ファイルの挿入
+@cindex ファイル挿入[ふぁいるそうにゅう]
+
+既存のバッファにファイルを@strong{insert-file}などで挿入する時には，
+Nemacs はまずそのバッファの変数@code{kanji-fileio-code} が @kbd{nil} 以
+外の有効な値であるかどうかを調べます．@kbd{nil}でなければ，挿入されるファ
+イルはそのコードで書かれているものとしてバッファに読み込みます．変数
+@code{kanji-fileio-code}が @kbd{nil} の時，つまりバッファが１バイト文字
+だけで構成されている時には，挿入されるファイルは
+@code{kanji-expected-code}で示されるコードで書かれているとして読み込みを
+行ないます．@refill @*
+
+@noindent
+変数:
+@defvr {Global Variable} kanji-expected-code
+Nemacs がファイルを読み込む時に予期する日本語文字コード体系
+@table @asis
+@item nil
+変数 @code{kanji-fileio-code}の値
+@item t
+ファイルを調べてコードを推測する
+@item 0
+バッファ漢字コードと同じ（無変換）
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+@ifinfo
+@defvr {Global Variable} default-kanji-fileio-code
+バッファの変数@kbd{kanji-fileio-code}のデフォールト値
+@table @asis
+@item nil
+未設定
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+@end ifinfo
+
+@noindent
+コマンド:
+@deffn Command set-kanji-expected-code VAL
+@code{kanji-expected-code} の値を VALに設定する．
+@table @asis
+@item nil
+変数 @code{kanji-fileio-code}の値
+@item t
+ファイルを調べてコードを推測する
+@item 0 または 'noconv または "NOCONV"
+無変換
+@item 1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item 2 または 'JIS または "JIS"
+JISコード
+@item 3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+@deffn Command set-kanji-fileio-code CODE
+kanji-fileio-code の値をCODEに設定する．
+@table @asis
+@item nil
+未設定
+@item 0 または 'noconv または "NOCONV"
+無変換
+@item 1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item 2 または 'JIS または "JIS"
+JISコード
+@item 3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+
+@node 漢字ファイルの読み込み, 新規ファイル作成時, ファイルの挿入, ファイル入力
+@subsubsection 漢字ファイルの読み込み
+@cindex find file
+@findex find-file
+@findex find-alternate-file
+@findex find-file-other-window
+
+@strong{find-file},@strong{find-alternate-file},@strong{find-file-other-window}
+のいずれかを行なってファイルを読み込む場合に，数引数を与えることによって
+一時的に@code{kanji-expected-code}を指定することができます．
+@code{kanji-expected-code}を恒久的に変えてしまいたい場合には，関数
+@strong{set-kanji-expected-code}を使って下さい．@refill
+
+@table @kbd
+@item C-u -   C-x C-f
+@itemx C-u -   C-x C-v
+@itemx C-u -   C-x 4 C-f
+@kbd{kanji-expected-code}は nil，つまり変数@kbd{kanji-fileio-code}の値．
+@item C-u     C-x C-f
+@itemx C-u     C-x C-v
+@itemx C-u     C-x 4 C-f
+@kbd{kanji-expected-code}は t，つまりファイルを調べて推測する．
+@item C-u 0   C-x C-f
+@itemx C-u 0   C-x C-v
+@itemx C-u 0   C-x 4 C-f
+@kbd{kanji-expected-code}は 0，つまりアスキー文字のみ．
+@item C-u 1   C-x C-f
+@itemx C-u 1   C-x C-v
+@itemx C-u 1   C-x 4 C-f
+@kbd{kanji-expected-code}は 1，つまりシフトJIS．
+@item C-u 2   C-x C-f
+@itemx C-u 2   C-x C-v
+@itemx C-u 2   C-x 4 C-f
+@kbd{kanji-expected-code}は 2，つまりJIS．
+@item C-u 3   C-x C-f
+@itemx C-u 3   C-x C-v
+@itemx C-u 3   C-x 4 C-f
+@kbd{kanji-expected-code}は 3，つまりEUC．
+@end table
+
+@ifinfo
+変数：
+@defvr {Global Variable} kanji-expected-code
+Nemacs がファイルを読み込む時に予期する日本語文字コード体系
+@table @asis
+@item nil
+変数 @code{kanji-fileio-code}の値
+@item t
+ファイルを調べてコードを推測する
+@item 0
+アスキー，つまり無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+
+@noindent
+コマンド:
+@deffn Command set-kanji-expected-code VAL
+@kbd{kanji-expected-code}を VAL に設定する．
+@end deffn
+@end ifinfo
+
+@node     新規ファイル作成時, ファイル出力 , 漢字ファイルの読み込み,  ファイル入力
+@subsubsection 新規ファイル作成
+
+新規に作成したファイルのファイル漢字コードのデフォールト値は，変数
+@code{default-kanji-fileio-code-find-file-not-found}で指定できます．この
+変数のデフォールト値は，変数@code{default-kanji-fileio-code}の値です．
+
+@noindent
+変数:
+@defvr {Local Variable} default-kanji-fileio-code-find-file-not-found
+新規に作成されたファイルのファイル漢字コードのデフォールト値．ファイル入
+力時には，@kbd{kanji-expected-code}がnilの場合にのみ使用される．
+@table @asis
+@item nil
+未設定
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+
+@node ファイル出力, プロセス間通信 , ファイル入力, ファイル入出力
+@subsection ファイル出力
+@cindex ファイル出力[ふぁいるしゅつりょく]
+
+バッファをファイルに書き出す時には，Nemacsはバッファ中の文書を変数
+@code{kanji-fileio-code}に示されたコードに変換した上で，書き出しを行ない
+ます．
+
+@ifinfo
+@noindent
+変数:
+@defvr {Local Variable} kanji-fileio-code
+ファイル入出力に用いられるソース／ターゲット漢字コード．ファイル入力時に
+は，@kbd{kanji-expected-code}がnilの場合にのみ使用される．
+@table @asis
+@item nil
+未設定
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+@defvr {Global Variable} default-kanji-fileio-code
+バッファの変数@kbd{kanji-fileio-code}のデフォールト値
+@table @asis
+@item nil
+未設定
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+@end ifinfo
+
+@node プロセス間通信,機能, ファイル入出力, 日本語文字コード
+@section 外部プロセスとの通信
+@cindex プロセス間通信[ぷろせすかんつうしん]
+@cindex 外部プロセス[がいぶぷろせす]
+@cindex サーバプロセス[さーばぷろせす]
+@cindex プロセス漢字コード[ぷろせすかんじこーど]
+@findex call-process-region
+@findex call-process
+@findex open-network-stream
+@findex start-process
+
+Nemacs は外部プロセスやネットワーク上のサーバプロセスを起動し，それらと
+通信することができます．それぞれのプロセスは独自の@strong{プロセス漢字コー
+ド}を持っています．関数 @strong{process-kanji-code}によって各プロセスの
+@strong{プロセス漢字コード}を知ることができます． Nemacs は指定された日本語
+文字コードにテキストを変換して外部プロセスやサーバプロセスと通信し，外部
+プロセスやサーバプロセスから受け取ったテキストをNemacsの内部表現に変換し
+ます． @refill
+
+関数@strong{start-process}や@strong{open-network-stream}によって外部プロ
+セスを起動したり，@strong{call-process}や @strong{call-process-region}に
+よって実行したりする場合には， Nemacs はフック
+@strong{find-kanji-process-code}を呼び，結果を@strong{プロセス漢字コード}
+に設定します．関数@strong{set-process-kanji-code}によって@strong{プロセ
+ス漢字コード}を直接設定したり，関数@strong{change-process-code}
+(@kbd{C-x C-k p})によって@strong{プロセス漢字コード}を変更することもでき
+ます．さらに，フック@strong{find-kanji-process-code}の値を変更して 
+Nemacsが@strong{プロセス漢字コード}を見つける方法をユーザ毎に変更えたり
+することもできます．（@xref{プロセスについてもっと}）@refill @*
+
+@strong{プロセス漢字コード}のデフォルト値は
+@code{default-process-kanji-code}に保持され，関数
+@strong{change-default-process-code}(@kbd{C-x C-k P})や
+@strong{set-default-kanji-process-code}で設定できます． @refill @*
+
+@noindent
+変数:
+@defvr {Hook} find-kanji-process-code BUFFER/SERVICE PROGRAM/HOST CODE
+バッファBUFFERのプログラムPROGRAMまたはホストHOSTのサービスSERVICEの
+@strong{プロセス漢字コード}を返す．CODEのニーモニックは以下の通り．
+@table @asis
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defvr
+@defvr {Global Variable} default-kanji-process-code
+@strong{プロセス漢字コード}のデフォールト値
+@end defvr
+@defvr {Global Variable} to-ascii-process
+アスキー文字を選択するためのエスケープシーケンスの最後の文字．
+（JISコードが用いられている場合のみ有効）
+@end defvr
+@defvr {Global Variable} to-kanji-process
+日本語文字を選択するためのエスケープシーケンスの最後の文字．
+（JISコードが用いられている場合のみ有効）
+@end defvr
+
+@noindent
+コマンド:
+@defun process-kanji-code &optional PROCESS
+プロセスPROCESSの日本語文字コードを返す．引数なしで呼ばれた場合には， 現
+在のバッファプロセスの@strong{プロセス漢字コード}を返す．@strong{プロセス漢字
+コード}のニーモニックは以下の通り．
+@table @asis
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defun
+@deffn Command change-process-code
+@emph{プロセス漢字コード}を次の順序で切替える．@*
+NIL（未設定）→0（無変換）→1（シフトJISコード）→2（JISコード）→3（EUC
+コード）→NIL
+@end deffn
+@deffn Command set-process-kanji-code PROCESS CODE
+プロセスPROCESSの@strong{プロセス漢字コード}をCODEに設定する．PROCESS がNIL
+の場合には，現在のバッファプロセスの @strong{プロセス漢字コード}を設定する．
+@table @asis
+@item 0 または 'noconv または "NOCONV"
+無変換
+@item 1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item 2 または 'JIS または "JIS"
+JISコード
+@item 3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+@deffn Command change-default-process-code
+@kbd{default-kanji-process-code}の値を次の順序で切替える．@*
+NIL（未設定）→0（無変換）→1（シフトJISコード）→2（JISコード）→3（EUC
+コード）→NIL
+@end deffn
+@deffn Command set-default-kanji-process-code CODE
+@code{default-kanji-process-code}の値をCODEに設定する．CODEは以下のいず
+れか．
+@table @asis
+@item 0 または 'noconv または "NOCONV"
+無変換
+@item 1 または 'shift-JIS または "SHIFT-JIS"
+シフトJISコード
+@item 2 または 'JIS または "JIS"
+JISコード
+@item 3 または 'euc または "EUC"
+EUCコード
+@end table
+@end deffn
+@noindent
+
+@menu
+* MoreProcess: プロセスについてもっと. Nemacsはどうやってプロセス漢字コードを決めるか
+@end menu
+
+@node プロセスについてもっと, 機能 , プロセス間通信, プロセス間通信
+@subsection プロセスについてもっと
+@cindex プロセス間通信[ぷろせすかんつうしん]
+
+@code{(load-library "kanji-util")}を行なうと，Nemacsが@strong{プロセス漢
+字コード}を決める方法を変えることができるようになります．関数
+@strong{define-program-kanji-code}は外部プロセスの@strong{プロセス漢字コー
+ド}を宣言し，関数 @strong{define-service-kanji-code}はネットワーク上のサー
+バの@strong{プロセス漢字コード}を宣言します．これらの宣言をおこなうと，
+@strong{find-kanji-process-code}は宣言に沿った値を返すようになります．関
+数@strong{find-kanji-process-code} が適当な値を返さなかった場合には，
+Nemacsは代わりに変数 @code{default-kanji-process-code} の値を用いてプロ
+セス通信を行ないます． @refill
+
+@noindent
+関数:
+@ifinfo
+@defun find-kanji-process-code BUFFER/SERVICE PROGRAM/HOST CODE
+バッファBUFFERのプログラムPROGRAMまたはホストHOSTのサービスSERVICEの
+@strong{プロセス漢字コード}を返す．CODEのニーモニックは以下の通り．
+@table @asis
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+@end defun
+@end ifinfo
+@defun define-program-kanji-code BUFFER PROGRAM CODE
+BUFFERとPROGRAM は正規表現 か NIL． NIL は任意のストリングとマッチする．
+CODEはシンボルか日本語文字コードニーモニック．
+@strong{find-kanji-process-code}がBUFFERとPROGRAMの２つの引数で呼ばれた
+場合に，@strong{プロセス漢字コード}を決定するCODEを定義する．CODE がシン
+ボルならばCODE の関数定義が呼ばれ，日本語文字コードニーモニックが返る．
+@refill
+コードニーモニックは以下の通り．
+@table @asis
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+たとえば，@code{(define-program-kanji-code ".*shell.*" nil 2)} はバッファ
+名が"shell"を含む場合にはJISコードを使うように，
+@strong{find-kanji-process-code} を変更する． @refill
+@end defun
+@defun define-service-kanji-code SERVICE HOST CODE
+SERVICEとHOST は正規表現かNIL.  NIL は任意のストリングとマッチする．CODE
+はシンボルか日本語文字コードニーモニック．@strong{find-kanji-process-code}
+がSERVICEとHOSTの２つの引数で呼ばれた場合に，@strong{プロセス漢字コード}
+決定するCODEを定義する．CODE がシンボルならばCODE の関数定義が呼ばれ，日
+本語文字コードニーモニックが返る． @refill
+コードニーモニックは以下の通り．
+@table @asis
+@item 0
+無変換
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+たとえば， @code{(define-service-kanji-code "wnn" nil 0)}はNemacsがサー
+ビス"wnn"を使用する場合にはコード変換を行なわないことを宣言する．
+@refill
+@end defun
+
+@node 機能, 日本語文字コードを扱う関数, 日本語文字コード, NemacsUsers
+@chapter Nemacsの機能
+@cindex 日本語[にほんご]
+@cindex 日本語処理[にほんごしょり]
+
+Nemacsは日本語文書編集の様々な機能を提供します．
+
+@menu
+* Jcodefunc: 日本語文字コードを扱う関数. 日本語文字コード体系に関する関数
+* Jtextfunc: 日本語文書編集機能.         文書編集の機能
+* Enhance:   日本語処理のための拡張.
+@end menu
+
+@node 日本語文字コードを扱う関数, 日本語文書編集機能, 機能, 機能
+@section 日本語文字コード関連の関数
+@cindex 日本語文字コード変換[にほんごもじこーどへんかん]
+@cindex コード変換コマンド[こーどへんかんこまんど]
+
+Nemacsは日本語文字コード体系に関連して以下の関数を提供しています．これら
+によって，バッファ中のテキストの日本語文字コード体系を変換することなどが
+可能です．
+
+@noindent
+コマンド:
+@deffn Command convert-region-kanji-code SOURCE TARGET
+SOURCEとTARGETは文字コードのニーモニック．
+@table @asis
+@item 0
+無変換
+@item 1
+シフトJISコード
+@item 2
+JISコード
+@item 3
+EUCコード
+@end table
+ポイントからマークまでのテキストの日本語文字コードを，SOURCEから
+TARGETに変換する．
+@end deffn
+@deffn Command kanji-delete-region
+ポイントからマークまでのテキストを削除する．@code{kanji-flag}が@kbd{t}で
+ポイントあるいはマークが２バイト文字の間にある場合には削除されなかった１
+バイトを１バイトの空白文字で置き換える．
+@end deffn
+
+@noindent
+関数:
+@defun convert-string-kanji-code STRING SOURCE TARGET
+STRINGの日本語文字コードをSOURCEからTARGETに変換し，その結果を返す．
+@end defun
+@defun check-region-kanji-code
+ポイントからマークまでのテキストの，日本語文字コードニーモニックを返す．
+ニーモニックは以下の通り．
+@table @asis
+@item nil
+リージョンに日本語文字コードは含まれていない．
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+NemacsがEUCとシフトJISのどちらであるか判断できなかった時には， EUC（ニー
+モニックは３）が返る．
+@end defun
+@defun check-string-kanji-code STRING
+STRINGの日本語文字コードを返す．ニーモニックは以下の通り．
+@table @asis
+@item nil
+STRINGに日本語文字コードは含まれていない．
+@item 1
+シフトJIS
+@item 2
+JIS
+@item 3
+EUC
+@end table
+NemacsがEUCとシフトJISのどちらであるか判断できなかった時には， EUC（ニー
+モニックは３）が返る．
+@end defun
+@defun kanji-char-after POS
+引数 POSは数．現在のバッファ中のposition POSにある日本語文字のEUCコード
+をintegerで返す．文字が日本語文字でなければ，その文字のnormal codeを返す．
+POSが領域外であれば，NILを返す．
+@end defun
+@defun jcode-type POS
+position POSの文字の文字種を返す．文字種ニーモニックは以下の通り．
+@table @asis
+@item 0
+日本語文字以外
+@item 1
+日本語文字の第一バイト
+@item 2
+日本語文字の第二バイト
+@item nil
+POSが領域外
+@end table
+@end defun
+
+@node 日本語文書編集機能, 日本語正書法, 日本語文字コードを扱う関数, 機能
+@section 日本語文書編集機能
+@cindex 日本語文書編集機能[にほんごぶんしょへんしゅうきのう]
+
+Nemacs は文節（@pxref{日本語正書法}）単位のオペレーションや日本語テキス
+トの探索，置換を行なうことができます．日本語文書においては語単位の操作よ
+り，文節単位の操作の方が一般的であるという判断に基づいて，Nemacsでは日本
+語文字については疑似的な文節単位の操作を行なうように語の概念を拡張してい
+ます．（日本語文書以外のテキストについては，オリジナルのGNU Emacsが提供
+する語単位の操作と同等です．@xref {シンタックス}）日本語には文節境界を示
+す記法はないので，Nemacsはすべての文字に対してカテゴリを定義し，これを用
+いて文節境界を推測し，疑似文節を切り出しています．
+
+@menu
+* Ontho: 日本語正書法.      日本語の書き方について
+* Syntax: シンタックス.  日本語文字のシンタックス
+* Bunsetsu: 疑似文節.    語の概念の拡張
+* Search: 探索.	日本語文書の探索と置換
+* Fill&Justify: 行詰めと行揃え.
+@end menu
+
+@node 日本語正書法, シンタックス,日本語文書編集機能 , 日本語文書編集機能
+@subsection 日本語正書法
+@cindex 日本語正書法[にほんごせいしょほう]
+@cindex ひらがな[ひらがな]
+@cindex かたかな[かたかな]
+@cindex 漢字[かんじ]
+@cindex かな[かな]
+@cindex 文節[ぶんせつ]
+
+日本語の文書は５種類の文字から構成されます．５種類の文字とは，ひらがな，
+かたかな，漢字，記号と英数字です．ひらがなとかたかなを総称してかなと呼び
+ます．ひらがなとかたかなは表音文字で，漢字は表意文字です．日本語には多く
+の同音意義語があり，おなじ発音とおなじかな表記を持つ漢字の語がたくさんあ
+ります．かなは，ローマ字と呼ばれるアルファベット表記がありますが，この表
+記法は普通の日本語文書にはほとんど用いられません．
+
+日本語の文は１つ以上の句からでき，句は１つ以上の@emph{文節}からできてい
+ます．文節は概略次のようなものです．
+@enumerate
+@item
+助詞や助動詞を除く語
+@item
+前項のものに１つ以上の助詞あるいは助動詞が続いたもの
+@end enumerate
+読点（。）が文の区切りを示し，句点（、）が句の区切りを示します．文節や語
+の区切りを示す記法はありません．
+
+@node シンタックス,疑似文節, 日本語正書法, 日本語文書編集機能
+@comment  node-name,  next,  previous,  up
+@subsection 日本語文字のシンタックス
+
+GNU Emacsでは各バイトに対して@code{char-syntax}が定義できます．GNU Emacs
+の@strong{char-syntax} を拡張して，Nemacsでは日本語文字コードの２つのバ
+イトのうちいずれかであることを示すニーモニック@kbd{j}が使えるようになっ
+ています（@pxref{char-syntax}）．
+
+さらにNemacsでは@strong{char-syntax}を２バイト文字に拡張した
+@strong{char-category}を定義しています．@strong{char-category}は，２バイ
+ト文字（日本語文字コード体系に含まれる文字）を記号，英数字，ひらがな，特
+殊ひらがな，かたかな，特殊かたかな，ギリシャ文字，ロシア文字，未定義，漢
+字，特殊漢字の１１種類に分類します．（@xref{char-category}．） この分類
+に基づいてNemacsは文節の疑似的な切り出しを行ないます．またこの分類に基づ
+いて，正規表現が拡張および変更されています．@refill
+
+@noindent
+関数:
+@defun char-syntax CHAR
+CHARのsyntaxコードを返す．
+@end defun
+@defun char-category POS/STRING
+位置POSの文字またはストリングSTRINGの最初の文字の，categoryコードを返す．
+POSが領域外またはSTRINGがNULLの場合は@kbd{nil}を返す．
+@end defun
+
+@node char-syntax, char-category , ,シンタックス
+@comment  node-name,  next,  previous,  up
+@subsubsection char-syntax
+@cindex char-syntax
+@cindex whitespace syntax
+@cindex word constituent
+@cindex symbol constituent
+@cindex punctuation
+@cindex open parenthesis
+@cindex close parenthesis
+@cindex string quote
+@cindex character quote
+@cindex paired delimiter
+@cindex expression prefix operator
+@cindex comment starter
+@cindex comment ender
+@cindex first or second byte of a Japanese character
+
+Nemacsでは次のchar-syntaxが定義されています．
+
+syntaxのコード:
+@table @kbd
+@item SPC
+whitespace syntax.
+@item w
+word constituent.
+@item _
+symbol constituent.
+@item .
+punctuation.
+@item (
+open parenthesis.
+@item )
+close parenthesis.
+@item "
+string quote.
+@item \
+character quote.
+@item $
+paired delimiter.
+@item '
+expression prefix operator.
+@item <
+comment starter.
+@item >
+comment ender.
+@item j
+first or second byte of Jcode
+@end table
+
+@node     char-category, 疑似文節, char-syntax,シンタックス
+@subsubsection char-category
+@cindex char-category
+@cindex 記号[きごう]
+@cindex 英数字[えいすうじ]
+@cindex ひらがな[ひらがな]
+@cindex 特殊ひらがな[とくしゅひらがな]
+@cindex かたかな[かたかな]
+@cindex 特殊かたかな[とくしゅかたかな]
+@cindex ギリシャ文字[ぎりしゃもじ]
+@cindex ロシア文字[ろしあもじ]
+@cindex 未定義[みていぎ]
+@cindex 漢字[かんじ]
+@cindex 特殊漢字[とくしゅかんじ]
+
+Nemacsでは，すべての（１バイトと２バイトの）文字に対してchar-categoryが
+定義されています．
+
+char-categoryのコード:@*
+１バイト文字の場合：
+@table @kbd
+@item SPC
+whitespace syntax.
+@item w
+word constituent.
+@item _
+symbol constituent.
+@item .
+punctuation.
+@item (
+open-parenthesis.
+@item )
+close parenthesis.
+@item "
+string quote.
+@item \
+character quote.
+@item $
+paired delimiter.
+@item '
+expression prefix operator.
+@item <
+comment starter.
+@item >
+comment ender.
+@end table
+２バイト文字の場合：
+@table @kbd
+@item s
+記号．漢字コードの区点が１、２、８区のもの．
+@item a
+英数字．漢字コードの区点が３区のもの．
+@item h
+ひらがな．漢字コードの区点が４区のもの．特殊ひらがなを除く．
+@item H
+特殊ひらがな．"ヽ", "ヾ", "ゝ", "ゞ"
+@item k
+かたかな．漢字コードの区点が５区のもの．特殊かたかなを除く．
+@item K
+特殊かたかな．"ー"
+@item g
+ギリシャ文字．漢字コードの区点が６区のもの．
+@item r
+ロシア文字．漢字コードの区点が７区のもの．
+@item u
+未定義．漢字コードの区点が９〜１５区のもの．
+@item c
+漢字．漢字コードの区点が１６区以上のもの．特殊漢字を除く．
+@item C
+特殊漢字． "仝", "々", "〆", "〇"
+@end table
+
+@node 疑似文節, 探索, シンタックス, 日本語文書編集機能
+@subsection 文節＝拡張word
+@cindex 語[ご]
+@cindex 疑似文節[ぎじぶんせつ]
+@cindex 拡張word[かくちょうword]
+
+Nemacsは１バイトコードを12のカテゴリに，日本語文字コード （２バイトコー
+ド）を11のカテゴリに分けています（@pxref{char-category}）． GNU Emacsで
+は「語」は，word constituentの並びとして定義されています．Nemacsでは，日
+本語文字コードについてこの定義を拡張し，次のようにしています．@refill
+@table @asis
+@item 拡張ひらがな ::=
+( ひらがな | 特殊ひらがな )
+@item 拡張かたかな ::=
+( かたかな | 特殊かたかな )
+@item 拡張漢字 ::=
+( 漢字 | 特殊漢字 )
+@item 拡張word  ::=
+( word@*
+| ( 英数字 | 拡張ひらがな | 拡張カタカナ | ギリシャ文字@*
+| ロシア文字 | 拡張漢字 )+ 拡張ひらがな )
+@item 拡張カテゴリ ::=
+( 拡張ひらがな | 拡張かたかな |拡張漢字 )
+@end table
+
+つまり，Nemacsは次のような文字のシーケンスを１つの拡張wordとみなします．
+@enumerate
+@item
+連続するword constituents
+@item
+連続する同一の拡張カテゴリに属する日本語文字
+@item
+前項のものに１つ以上の拡張ひらがなが続いたもの
+@end enumerate
+
+この拡張wordは，日本語文中ではほぼ文節に対応し，１バイト文字シーケンス中
+ではwordと同じものです．
+
+@node 探索, 行詰めと行揃え, 疑似文節, 日本語文書編集機能
+@subsection 日本語ストリングの探索と置換
+@cindex 探索[たんさく]
+@cindex 置換[ちかん]
+@findex isearch-backward-regexp
+@findex isearch-backward
+@findex isearch-forward-regexp
+@findex isearch-forward
+@findex isearch
+@findex re-search-backward
+@findex re-search-forward
+@findex replace-regexp
+@findex replace-string
+@findex search-backward
+@findex search-forward
+
+日本語文書についても探索コマンド @strong{search-forward},
+@strong{search-backward},
+@strong{isearch-forward},@strong{isearch-backward},
+@strong{re-search-forward},@strong{re-search-backward},
+@strong{isearch-forward-regexp},@strong{isearch-backward-regexp}や置換
+コマンド@strong{replace-string},@strong{replace-regexp}を使うことがで
+きます．@refill
+
+インクリメンタル探索(@strong{isearch})中にストリング入力を行なうには，
+@kbd{C-k}をタイプして下さい．このモードではミニバッファ中で日本語ストリ
+ングの入力を行なうことができます．ストリング入力が終ったら，@key{RET}キ
+イを押して下さい．Nemacsは@strong{isearch}を再開します．@refill
+
+探索や置換に用いる正規表現は，拡張wordやchar-categoryに対応して拡張およ
+び変更されています．@*
+
+@menu
+RegExp: 日本語正規表現. 
+@end menu
+
+@node 日本語正規表現, 行詰めと行揃え, 探索, 探索
+@cindex 正規表現[せいきひょうげん]
+
+探索や置換に用いる正規表現は，拡張wordやchar-categoryに対応して次のよ
+うに拡張および変更されています．@*
+
+@noindent
+拡張：
+@table @asis
+@item \cCATEGORY
+char-category が CATEGORY の文字と合致する．
+@item \CCATEGORY
+char-category が CATEGORY でない文字と合致する．
+@item \h
+改行を除く１バイト文字１文字と合致する．
+@item \z
+すべての２バイト文字１文字と合致する．
+@item [...]
+各コードと等しい１バイトもしくは２バイト文字と合致する．
+@item normal code
+それと等しい１バイトもしくは２バイト文字と合致する．
+@end table
+@noindent
+変更：
+@table @asis
+@item .
+改行文字を除く１バイト文字１文字またはすべての２バイト文
+字１文字と合致する．@refill
+@item \w
+拡張wordの構成要素の文字と合致する。すなわち１バイト
+文字の場合は syntax-table の char-syntax が "w" のもの、２
+バイト文字の場合は文字の分類が英数字、拡張ひらがな、拡張カタカ
+ナ、ギリシャ文字、ロシア文字、拡張漢字のものと合致する．
+\(\sw\|\ca\|\ch|\cH\|\ck|\cK\|\cg\|\cr\|\cc|\cC\)と等価．@refill
+@item \W
+拡張wordの構成要素でない文字と合致する．
+@item \b
+拡張wordの前後にある空の文字列と合致する．
+@item \B
+拡張wordの前後にない空の文字列と合致する．
+@item \<
+拡張wordの前にある空の文字列と合致する．
+@item \>
+拡張wordの後にある空の文字列と合致する．
+@end table
+
+注意: \sw (\Sw) は GNU Emacs では \w (\W) と等価ですが，Nemacsでは等価
+ではありません．\sw (\Sw) は拡張word ではなく word の構成要素（あるい
+はそれ以外）とのみ合致します．@refill
+
+@node 行詰めと行揃え,  行詰め, 探索, 日本語文書編集機能    
+@subsection 行詰めと行揃え
+
+Nemacsは日本語文書についても行詰めと行揃えの機能を提供しています．
+
+@menu
+* Fill: 行詰め.	   日本語文書の行詰め
+* Justify: 行揃え. 日本語文書の行揃え
+@end menu
+
+@node 行詰め, 行揃え, , 行詰めと行揃え    
+@subsubsection 行詰め
+@cindex 行詰め[ぎょうつめ]
+@findex fill-paragrap
+@cindex 禁則[きんそく]
+@cindex ぶら下げ処理[ぶらさげしょり]
+@cindex 追いだし処理[おいだししょり]
+
+Nemacsは日本語文書についても，コマンド@strong{fill-paragraph}による行詰
+めや，@kbd{auto-fill-mode}における自動行詰め機能を提供しています．@refill
+
+日本語文書では，語の間にスペースはなく行は一定の長さで折り返されるのが普
+通です．しかし日本語文字のうちの一部の文字（ほとんど記号です）は行頭や行
+末に現れることができません．このような文字を正しく扱うために，Nemacsは行
+の長さを変えることがあります．日本語文書の行詰めはオリジナルのText Filling
+の拡張として実現されているので，
+英文字単語中で行が終ることはありません．@refill
+
+行頭及び行末禁則の一般規則は次のようになります．
+
+@table @strong
+@item 行頭禁則文字
+文／句の終りを示す記号は行頭に現れない．このような記号としては句点（、）
+読点（。）などがある．変数 @kbd{kinsoku-bol-chars} はこのような文字のリ
+ストを保持する．@refill
+@item 行末禁則文字
+文／句の始まりを示す記号は行末に現れない．このような記号としてはかぎ括弧
+開け（「），括弧開け（（）などがある．変数 @kbd{kinsoku-eol-chars} はこ
+のような文字のリストを保持する．@refill
+@end table
+
+Nemacsは，以下のどちらかの方法（禁則処理）を使って行の長さを変え，行頭行
+末禁則の規則を守ります．
+
+@table @strong
+@item ぶら下げ処理
+行の長さを１ないし複数文字分伸ばす．変数@kbd{kinsoku-nobashi-limit}が伸
+ばし得る最大文字数を示します．
+@item 追いだし処理
+行の長さを１ないし複数文字分短くする．
+@end table
+
+Nemacsは次の場合に限り追い出しを，それ以外の場合ぶら下げを行ないます．
+
+@itemize @bullet
+@item
+禁則処理を行なわないと行末が行末禁則文字であり，その次の文字が行末禁則で
+ない場合．
+@item
+行末禁則文字が行末付近で続き，変数@kbd{kinsoku-nobashi-limit}で示される
+以上にぶら下げる必要がある場合．
+@end itemize
+
+@noindent
+変数：
+@defvr {Global Variable} kinsoku-bol-chars
+行頭禁則文字のリスト．
+@end defvr
+@defvr {Global Variable} kinsoku-eol-chars
+行末禁則文字のリスト．
+@end defvr
+@defvr {Global Variable} kinsoku-nobashi-limit
+ぶら下げ処理によって伸ばし得る文字数（１バイト文字）の最大値．
+@end defvr
+
+@node 行揃え, 日本語処理のための拡張, 行詰め, 行詰めと行揃え    
+@subsubsection 行揃え
+@cindex 行揃え[ぎょうそろえ]
+
+Nemacsは日本語文書についても行揃えを提供しています．英文の場合には語の間
+の空白文字を増やすことによって行揃えが行なわれています．日本語の場合には
+語間には空白文字をいれてはならないので，句読点の後ろと alphanumerics と
+日本語文字の間に空白文字を挿入して行揃えを実現しています．
+@refill
+
+@node 日本語処理のための拡張, ピクチュアモード , 日本語文書編集機能,機能
+@section 日本語処理のための拡張
+
+日本語処理を行なうために，ピクチュアモード，矩形領域処理，略称展開
+(dynamic abbreviation)の３点が拡張されています．
+
+@menu
+* PictureMode: ピクチュアモード.
+* Rectangle: 矩形領域の処理.
+* Abbrev: 動的な略称展開.
+@end menu
+
+@node ピクチュアモード, 矩形領域の処理 ,日本語処理のための拡張 , 日本語処理のための拡張
+@subsection ピクチュアモード
+@cindex ピクチュアモード[ぴくちゅあもーど]
+
+Nemacs におけるピクチュアモードはファイル@file{picture.el} へのパッチに
+よって，文字の挿入方向，日本語入力の方法の２点が拡張されています．@refill
+
+@menu
+* Direction:  文字の挿入方向の拡張.
+* InputInPic: 日本語入力.
+@end menu
+
+@node     文字の挿入方向の拡張, 日本語入力, ピクチュアモード, ピクチュアモード
+@subsubsection 文字の挿入方向の拡張
+
+Emacsのピクチュアモードでは，１文字挿入された後のカーソルの移動方向を上
+下左右斜めに指定できます．斜めを指定した場合には，縦横各方向にそれぞれ１
+カラム（行）移動します．斜め指定の状態はモードライン上の`nw', `ne',
+`sw', `se' などのニーモニック表示で示されます．
+
+Nemacs では日本語文字は通常のアスキー文字の２倍の文字幅を持つので，上記
+に加え２カラムと１行斜めという指定が行なえるようになっています．指定状態
+は，`wnw', `ene', `wsw', `ese'
+のニーモニックで表示されます．
+
+`se' と `ese' 指定時のカーソルの移動は次のようになります．@*
+@group
+@example
+s
+ e
+  指
+   定
+    時
+
+s
+  e
+    s
+      指
+        定
+          時
+@end example
+@end group
+
+@noindent
+コマンド:
+@deffn Command picture-movement-wnw
+@kbd{C-c ~}．挿入後，左へ２カラム，上へ１行移動する．
+@end deffn
+@deffn Command picture-movement-ene
+@kbd{C-c \}．挿入後，右へ２カラム，上へ１行移動する．
+@end deffn
+@deffn Command picture-movement-wsw
+@kbd{C-c ?}．挿入後，左へ２カラム，下へ１行移動する．
+@end deffn
+@deffn Command picture-movement-ese
+@kbd{C-c |}．挿入後，右へ２カラム，下へ１行移動する．
+@end deffn
+
+@node     日本語入力, 矩形領域の処理, 文字の挿入方向の拡張, ピクチュアモード
+@subsubsection ピクチュアモードでの日本語入力
+@findex egg-self-insert-command
+@findex self-insert-after-hook
+
+Emacs の pictureモードでは，通常の文字は全て@strong{picture-self-insert} 
+というコマンドに割り付けられています．Nemacs では「たまご」による日本語
+入力を行なうために，「たまご」 使用時には通常文字を全て
+@strong{egg-self-insert-command} に割り付けます．「たまご」 が文字列を確
+定した後に呼ぶ@strong{self-insert-after-hook} には
+@strong{picture-insert-after-hook} が割り付けられ，この関数が文字列の入
+力処理を行ないます．@refill
+
+EGG 以外の日本語入力方式 (SKK 等) を用いる場合は，関数
+@kbd{picture-insert-string} （@kbd{C-c k}）を実行し、ミニバッファから日
+本語文字列を読み込まなくてはなりません．@refill @*
+
+@noindent
+関数:
+@defun picture-insert-after-hook BEGIN END
+現在のバッファにストリングを挿入した後実行されるhook.
+２引数BEGINとENDは挿入したストリングの先頭と最後の位置を示す．
+@end defun
+
+@noindent
+コマンド:
+@deffn Command picture-insert-string STR
+@kbd{picture-movement}コマンドによって指定された方向へポイントを移動させ
+ながら，ストリングSTRの構成文字を一文字ずつ挿入する．
+@end deffn
+
+@node 矩形領域の処理 , 動的な略称展開, ピクチュアモード, 日本語処理のための拡張
+@subsection 矩形領域の処理
+@cindex 矩形領域[くけいりょういき]
+
+矩形領域 (rectangle) の処理はファイル@file{rect.el} へのパッチによって拡
+張されています．
+
+GNU Emacs はバッファ内の矩形領域に対してさまざまな処理を行なう関数を持っ
+ています．しかしNemacs では 矩形領域の境界にまたがって日本語文字が存在す
+る可能性があります．これに対処するため，境界上の日本語文字はアスキーのス
+ペース２文字に置き換えた上で処理を行ないます．
+
+@ifinfo
+このため，
+@example
+		        ↓
+		これは rectangle の
+		境界に,日本語文字が存
+		在する場合の処理の例
+		です。test test test
+			     ↑
+@end example
+
+上のような２点で指定された矩形領域に対して @kbd{kill-rectangle}を行なう
+と，@refill
+
+@example
+		        ↓
+		これは rele の
+		境界に,日 字が存
+		在する場 理の例
+		です。test test
+			↑
+@end example
+
+というように２行目の「文」と３行目の「合」の２文字が削除されます．また，
+@kbd{yank-rectangle} を行なっても，
+
+@example
+		        ↓
+		これは rectangle の
+		境界に,日本語  字が存
+		在する場  の処理の例
+		です。test test test
+			     ↑
+@end example
+
+上記のようになり、元通りには復元しません．
+@end ifinfo
+
+@node 動的な略称展開, その他, 矩形領域の処理 , 日本語処理のための拡張
+@subsection 動的な略称展開
+
+ファイル@file{dabbrev.el} へのパッチによって，日本語についても動的略称展
+開(dynamic abbreviation)ができるようになっています．ワードの切り出しは
+拡張wordに従います．
+
+@node その他, ドキュメント, 機能, NemacsUsers
+@chapter  Nemacs についていろいろ
+@menu
+* Documents: ドキュメント.  ドキュメントの在処
+* Keymaps: キーマッピング.  キーマップの変更点
+@end menu
+
+@node ドキュメント, キーマッピング, , その他
+@section Nemacs のドキュメント
+@cindex ドキュメント[どきゅめんと]
+Nemacsに関連するドキュメントは次のものが (NEMACS)/etc ディレクトリにあり
+ます．
+
+@table @asis
+@item NEMACS.tut
+日本語 Nemacs チュートリアル． @kbd{C-h T}
+(@kbd{help-with-tutorial-for-nemacs})で読むことができます．英語版は 
+@kbd{C-h t}で起動されます． @refill
+@item NEMACS.log
+Nemacs Ver.3.2.以降の変更．
+@end table
+
+以下のマニュアルは (NEMACS)/man ディレクトリにあります．
+
+@table @asis
+@item nemacs.texinfo
+このinfoのソースファイル．
+@item egg.texinfo
+"EGG"システム用infoのソースファイル．
+@end table
+
+@node キーマッピング, コマンド一覧, ドキュメント, その他
+@section キーマッピングの変更
+@cindex key maps
+
+Nemacs は@kbd{M-$}を @kbd{esc-dol-map}に， @kbd{M-(}を
+@kbd{esc-par-map} にそれぞれ割り付けています． @refill
+
+@example
+(define-key esc-map "$" esc-dol-map)
+(define-key esc-map "(" esc-par-map)
+(define-key esc-dol-map "@@" 'kanji-jis-start)
+(define-key esc-dol-map "B" 'kanji-jis-start)
+(define-key esc-par-map "B" 'kanji-jis-end)
+(define-key esc-par-map "H" 'kanji-jis-end)
+(define-key esc-par-map "J" 'kanji-jis-end)
+@end example
+
+したがって，オリジナルGNU Emacsで@kbd{M-$}あるいは @kbd{M-(}が割り付けら
+れていた以下の関数については新たなキーが定義されています． @refill
+
+@example
+(define-key esc-map "#" 'spell-word)
+(define-key esc-map "@{" 'insert-parentheses)
+@end example
+
+キーボード入力としてJISコードを受け付ける場合には，Nemacsは関数
+@kbd{kanji-jis-start} と関数 @kbd{kanji-jis-end}を呼びます．JISコードを
+使用する場合にはこれらのキーマップを変えてはいけません．
+@refill
+
+@node NemacsLispers , マーカの拡張 , , Top
+@unnumbered NemacsLisp
+
+EmacsLispに関していくつかの拡張がなされています．
+
+@menu
+* Marker: マーカの拡張.
+* Attribute: 属性の付与.
+@end menu
+
+@node マーカの拡張, 属性の付与, , NemacsLispers
+@unnumberedsec マーカの拡張
+@cindex マーカ[まーか]
+
+Nemacsでは`point-type'という新しいタイプのマーカを提供しています．このタ
+イプのマーカの位置への挿入は，そのマーカをポイントのように挿入されたスト
+リングの直後に移動します．先頭にオリジナルのマーカ，最後尾にこの新しいマー
+カをおくことで設定される領域は，領域の全ストリングの削除や最後尾へのスト
+リングの挿入などについて特別な配慮を必要としません．@*
+
+@noindent
+コマンド:
+@deffn Command set-marker-type MARKER POINT-TYPE
+POINT-TYPEがNILでなければ，マーカMARKERのタイプを`point-type'に設定する．
+NILならばオリジナルのタイプに設定する．MARKERを返す．
+@end deffn
+
+@noindent
+関数:
+@defun insert-after-markers STRING/CHAR
+引数としてストリングか文字（いくつでも）をとる．ストリング／文字（たち）
+をポイントの後ろに挿入し，挿入位置を指している`point-type'のマーカを挿入
+されたテキストの直前に移動する．
+@end defun
+
+@node  属性の付与, , マーカの拡張, NemacsLispers
+@unnumberedsec 属性の付与
+@cindex 下線[かせん]
+@cindex 反転[はんてん]
+バッファ中の領域について，表示に関する属性を与えることができます．属性は
+X-Window上でのみ有効です．現在提供されている属性は下線と反転です．
+
+関数:
+@deffn Command attribute-on-region ATTR &optional FROM TO
+領域内の属性ATTRをonにする．ATTRは'underline'または'inverse'．
+プログラムから呼ぶ場合はさらに２引数FROMとTOをとる．FROMがNILの場合には
+(point-min)，TOがNILの場合には(point-max)が用いられる．
+@end deffn
+@deffn Command attribute-off-region ATTR &optional FROM TO
+領域内の属性ATTRをoffにする．ATTRは'underline'または'inverse'．
+@end deffn
+@defun attribute-get-attribute &optional POS
+位置POSのattribute rangeを返す．POSのデフォルト値はカレントポイント．
+attribute rangeは，attribute type，その始点，終点のリスト．
+@end defun
+
+
+@node コマンド一覧, 概念索引, ,NemacsUsers
+@comment  node-name,  next,  previous,  up
+@unnumbered コマンドカード
+
+@noindent
+@strong{チュートリアル}
+@table @asis
+@item 日本語版チュートリアルを起動
+@kbd{C-h T}
+@end table
+
+@noindent
+@strong{日本語文字モードの設定}
+@table @asis
+@item 日本語文字モード⇔alphanumericsモードの切替え
+@kbd{C-x C-k t}
+@item 日本語文字モード⇔alphanumericsモードのデフォルト値の切替え
+@kbd{C-x C-k T}
+@end table
+
+@noindent
+@strong{使用する日本語文字コード体系の設定}
+@table @asis
+@item キーボード漢字コードの設定
+@kbd{M-x set-kanji-input-code}
+@item キーボード漢字コードの切替え
+@kbd{C-x C-k i}
+@item ディスプレイ漢字コードの設定
+@kbd{M-x set-kanji-displkay-code}
+@item ディスプレイ漢字コードの切替え
+@kbd{C-x C-k d}
+@item ファイル漢字コードの設定
+@kbd{M-x set-kanji-fileio-code}
+@item ファイル漢字コードの切替え
+@kbd{C-x C-k f}
+@item ファイル読み込み時のファイル漢字コードの一時的切替え
+@kbd{C-u}@var{n}@kbd{C-x C-f}
+@item プロセス漢字コードの設定
+@kbd{M-x set-process-kanji-code}
+@item プロセス漢字コードの切替え
+@kbd{C-x C-k p}
+@item 選択されているコード体系を表示
+@kbd{C-x C-k C}または@kbd{C-x C-k c}
+@item ファイル漢字コードのデフォルト値の切替え
+@kbd{C-x C-k F}
+@item プロセス漢字コードのデフォルト値の切替え
+@kbd{C-x C-k P}
+@end table
+
+@noindent
+@strong{インクリメンタル探索}
+@table @asis
+@item ストリング入力
+（@kbd{C-s},@kbd{C-r}などの後）@kbd{C-k}@var{string}@key{RET}
+@end table
+
+@noindent
+@strong{ピクチュアモード}
+@table @asis
+@item 左へ２カラム，上へ１行カーソル移動
+@kbd{C-c ~}
+@item 右へ２カラム，上へ１行カーソル移動
+@kbd{C-c \}
+@item 左へ２カラム，下へ１行カーソル移動
+@kbd{C-c ?}
+@item 右へ２カラム，下へ１行カーソル移動
+@kbd{C-c |}
+@end table
+
+@noindent
+@strong{変更}
+@table @asis
+@item ポイントのある単語の綴りチェック
+@kbd{M-#}
+@item かっこの挿入
+@kbd{M-@{}
+@end table
+@noindent
+
+@node 概念索引, 関数・変数索引 ,コマンド一覧 , Top
+@unnumbered 概念索引
+
+@printindex cp
+
+@node 関数・変数索引,概念索引 , , Top
+@unnumbered 関数・変数索引
+
+@printindex fn
+
+@contents
+@bye
+

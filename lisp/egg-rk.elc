@@ -1,0 +1,865 @@
+
+(define-egg-mode "roma-kana" t)
+
+(defvar aa (quote ("k" "s" "t" "h" "y" "r" "w" "g" "z" "d" "b" "p" "c" "f" "j" "v")))
+
+(defrule (quote (aa aa)) "¤Ã" (quote (aa)))
+
+(defrule "tch" "¤Ã" "ch")
+
+(defvar q1 (quote ("b" "m" "p")))
+
+(defrule (quote ("m" q1)) "¤ó" (quote (q1)))
+
+(defrule "n" "¤ó")
+
+(defrule "N" "¤ó")
+
+(defvar enable-double-n-syntax nil "\
+*Enable \"nn\" input for \"¤ó\" ")
+
+(if enable-double-n-syntax (defrule "nn" "¤ó"))
+
+(defrule "n'" "¤ó")
+
+(defvar small (quote ("x")))
+
+(defrule (quote (small "a")) "¤¡")
+
+(defrule (quote (small "i")) "¤£")
+
+(defrule (quote (small "u")) "¤¥")
+
+(defrule (quote (small "e")) "¤§")
+
+(defrule (quote (small "o")) "¤©")
+
+(defrule (quote (small "ya")) "¤ã")
+
+(defrule (quote (small "yu")) "¤å")
+
+(defrule (quote (small "yo")) "¤ç")
+
+(defrule (quote (small "tu")) "¤Ã")
+
+(defrule (quote (small "tsu")) "¤Ã")
+
+(defrule (quote (small "wa")) "¤î")
+
+(defrule "a" "¤¢")
+
+(defrule "i" "¤¤")
+
+(defrule "u" "¤¦")
+
+(defrule "e" "¤¨")
+
+(defrule "o" "¤ª")
+
+(defrule "ka" "¤«")
+
+(defrule "ki" "¤­")
+
+(defrule "ku" "¤¯")
+
+(defrule "ke" "¤±")
+
+(defrule "ko" "¤³")
+
+(defrule "kya" "¤­¤ã")
+
+(defrule "kyu" "¤­¤å")
+
+(defrule "kye" "¤­¤§")
+
+(defrule "kyo" "¤­¤ç")
+
+(defrule "sa" "¤µ")
+
+(defrule "si" "¤·")
+
+(defrule "su" "¤¹")
+
+(defrule "se" "¤»")
+
+(defrule "so" "¤½")
+
+(defrule "sya" "¤·¤ã")
+
+(defrule "syu" "¤·¤å")
+
+(defrule "sye" "¤·¤§")
+
+(defrule "syo" "¤·¤ç")
+
+(defrule "sha" "¤·¤ã")
+
+(defrule "shi" "¤·")
+
+(defrule "shu" "¤·¤å")
+
+(defrule "she" "¤·¤§")
+
+(defrule "sho" "¤·¤ç")
+
+(defrule "ta" "¤¿")
+
+(defrule "ti" "¤Á")
+
+(defrule "tu" "¤Ä")
+
+(defrule "te" "¤Æ")
+
+(defrule "to" "¤È")
+
+(defrule "tya" "¤Á¤ã")
+
+(defrule "tyi" "¤Æ¤£")
+
+(defrule "tyu" "¤Á¤å")
+
+(defrule "tye" "¤Á¤§")
+
+(defrule "tyo" "¤Á¤ç")
+
+(defrule "tsu" "¤Ä")
+
+(defrule "cha" "¤Á¤ã")
+
+(defrule "chi" "¤Á")
+
+(defrule "chu" "¤Á¤å")
+
+(defrule "che" "¤Á¤§")
+
+(defrule "cho" "¤Á¤ç")
+
+(defrule "na" "¤Ê")
+
+(defrule "ni" "¤Ë")
+
+(defrule "nu" "¤Ì")
+
+(defrule "ne" "¤Í")
+
+(defrule "no" "¤Î")
+
+(defrule "nya" "¤Ë¤ã")
+
+(defrule "nyu" "¤Ë¤å")
+
+(defrule "nye" "¤Ë¤§")
+
+(defrule "nyo" "¤Ë¤ç")
+
+(defrule "ha" "¤Ï")
+
+(defrule "hi" "¤Ò")
+
+(defrule "hu" "¤Õ")
+
+(defrule "he" "¤Ø")
+
+(defrule "ho" "¤Û")
+
+(defrule "hya" "¤Ò¤ã")
+
+(defrule "hyu" "¤Ò¤å")
+
+(defrule "hye" "¤Ò¤§")
+
+(defrule "hyo" "¤Ò¤ç")
+
+(defrule "fa" "¤Õ¤¡")
+
+(defrule "fi" "¤Õ¤£")
+
+(defrule "fu" "¤Õ")
+
+(defrule "fe" "¤Õ¤§")
+
+(defrule "fo" "¤Õ¤©")
+
+(defrule "ma" "¤Þ")
+
+(defrule "mi" "¤ß")
+
+(defrule "mu" "¤à")
+
+(defrule "me" "¤á")
+
+(defrule "mo" "¤â")
+
+(defrule "mya" "¤ß¤ã")
+
+(defrule "myu" "¤ß¤å")
+
+(defrule "mye" "¤ß¤§")
+
+(defrule "myo" "¤ß¤ç")
+
+(defrule "ya" "¤ä")
+
+(defrule "yi" "¤¤")
+
+(defrule "yu" "¤æ")
+
+(defrule "ye" "¤¤¤§")
+
+(defrule "yo" "¤è")
+
+(defrule "ra" "¤é")
+
+(defrule "ri" "¤ê")
+
+(defrule "ru" "¤ë")
+
+(defrule "re" "¤ì")
+
+(defrule "ro" "¤í")
+
+(defrule "la" "¤é")
+
+(defrule "li" "¤ê")
+
+(defrule "lu" "¤ë")
+
+(defrule "le" "¤ì")
+
+(defrule "lo" "¤í")
+
+(defrule "rya" "¤ê¤ã")
+
+(defrule "ryu" "¤ê¤å")
+
+(defrule "rye" "¤ê¤§")
+
+(defrule "ryo" "¤ê¤ç")
+
+(defrule "lya" "¤ê¤ã")
+
+(defrule "lyu" "¤ê¤å")
+
+(defrule "lye" "¤ê¤§")
+
+(defrule "lyo" "¤ê¤ç")
+
+(defrule "wa" "¤ï")
+
+(defrule "wi" "¤ð")
+
+(defrule "wu" "¤¦")
+
+(defrule "we" "¤ñ")
+
+(defrule "wo" "¤ò")
+
+(defrule "ga" "¤¬")
+
+(defrule "gi" "¤®")
+
+(defrule "gu" "¤°")
+
+(defrule "ge" "¤²")
+
+(defrule "go" "¤´")
+
+(defrule "gya" "¤®¤ã")
+
+(defrule "gyu" "¤®¤å")
+
+(defrule "gye" "¤®¤§")
+
+(defrule "gyo" "¤®¤ç")
+
+(defrule "za" "¤¶")
+
+(defrule "zi" "¤¸")
+
+(defrule "zu" "¤º")
+
+(defrule "ze" "¤¼")
+
+(defrule "zo" "¤¾")
+
+(defrule "zya" "¤¸¤ã")
+
+(defrule "zyu" "¤¸¤å")
+
+(defrule "zye" "¤¸¤§")
+
+(defrule "zyo" "¤¸¤ç")
+
+(defrule "ja" "¤¸¤ã")
+
+(defrule "ji" "¤¸")
+
+(defrule "ju" "¤¸¤å")
+
+(defrule "je" "¤¸¤§")
+
+(defrule "jo" "¤¸¤ç")
+
+(defrule "da" "¤À")
+
+(defrule "di" "¤Â")
+
+(defrule "du" "¤Å")
+
+(defrule "de" "¤Ç")
+
+(defrule "do" "¤É")
+
+(defrule "dya" "¤Â¤ã")
+
+(defrule "dyi" "¤Ç¤£")
+
+(defrule "dyu" "¤Â¤å")
+
+(defrule "dye" "¤Â¤§")
+
+(defrule "dyo" "¤Â¤ç")
+
+(defrule "ba" "¤Ð")
+
+(defrule "bi" "¤Ó")
+
+(defrule "bu" "¤Ö")
+
+(defrule "be" "¤Ù")
+
+(defrule "bo" "¤Ü")
+
+(defrule "va" "¥ô¤¡")
+
+(defrule "vi" "¥ô¤£")
+
+(defrule "vu" "¥ô")
+
+(defrule "ve" "¥ô¤§")
+
+(defrule "vo" "¥ô¤©")
+
+(defrule "bya" "¤Ó¤ã")
+
+(defrule "byu" "¤Ó¤å")
+
+(defrule "bye" "¤Ó¤§")
+
+(defrule "byo" "¤Ó¤ç")
+
+(defrule "pa" "¤Ñ")
+
+(defrule "pi" "¤Ô")
+
+(defrule "pu" "¤×")
+
+(defrule "pe" "¤Ú")
+
+(defrule "po" "¤Ý")
+
+(defrule "pya" "¤Ô¤ã")
+
+(defrule "pyu" "¤Ô¤å")
+
+(defrule "pye" "¤Ô¤§")
+
+(defrule "pyo" "¤Ô¤ç")
+
+(defrule "kwa" "¤¯¤î")
+
+(defrule "kwi" "¤¯¤£")
+
+(defrule "kwu" "¤¯")
+
+(defrule "kwe" "¤¯¤§")
+
+(defrule "kwo" "¤¯¤©")
+
+(defrule "gwa" "¤°¤î")
+
+(defrule "gwi" "¤°¤£")
+
+(defrule "gwu" "¤°")
+
+(defrule "gwe" "¤°¤§")
+
+(defrule "gwo" "¤°¤©")
+
+(defrule "tsa" "¤Ä¤¡")
+
+(defrule "tsi" "¤Ä¤£")
+
+(defrule "tse" "¤Ä¤§")
+
+(defrule "tso" "¤Ä¤©")
+
+(defrule "xka" "¥õ")
+
+(defrule "xke" "¥ö")
+
+(defrule "xti" "¤Æ¤£")
+
+(defrule "xdi" "¤Ç¤£")
+
+(defrule "xdu" "¤É¤¥")
+
+(defrule "xde" "¤Ç¤§")
+
+(defrule "xdo" "¤É¤©")
+
+(defrule "xwa" "¤î")
+
+(defrule "xwi" "¤¦¤£")
+
+(defrule "xwe" "¤¦¤§")
+
+(defrule "xwo" "¤¦¤©")
+
+(defrule "1" "£±")
+
+(defrule "2" "£²")
+
+(defrule "3" "£³")
+
+(defrule "4" "£´")
+
+(defrule "5" "£µ")
+
+(defrule "6" "£¶")
+
+(defrule "7" "£·")
+
+(defrule "8" "£¸")
+
+(defrule "9" "£¹")
+
+(defrule "0" "£°")
+
+(defrule " " "¡¡")
+
+(defrule "!" "¡ª")
+
+(defrule "@" "¡÷")
+
+(defrule "#" "¡ô")
+
+(defrule "$" "¡ð")
+
+(defrule "%" "¡ó")
+
+(defrule "^" "¡°")
+
+(defrule "&" "¡õ")
+
+(defrule "*" "¡ö")
+
+(defrule "(" "¡Ê")
+
+(defrule ")" "¡Ë")
+
+(defrule "-" "¡¼")
+
+(defrule "=" "¡á")
+
+(defrule "`" "¡®")
+
+(defrule "\\" "¡ï")
+
+(defrule "|" "¡Ã")
+
+(defrule "_" "¡²")
+
+(defrule "+" "¡Ü")
+
+(defrule "~" "¡±")
+
+(defrule "[" "¡Ö")
+
+(defrule "]" "¡×")
+
+(defrule "{" "¡Ð")
+
+(defrule "}" "¡Ñ")
+
+(defrule ":" "¡§")
+
+(defrule ";" "¡¨")
+
+(defrule "\"" "¡É")
+
+(defrule "'" "¡Ç")
+
+(defrule "<" "¡ã")
+
+(defrule ">" "¡ä")
+
+(defrule "?" "¡©")
+
+(defrule "/" "¡¿")
+
+(defrule "," "¡¢")
+
+(defrule "." "¡£")
+
+(defvar zenkaku-escape "Z")
+
+(defvar hankaku-escape "~")
+
+(defrule (quote (zenkaku-escape "0")) "£°")
+
+(defrule (quote (zenkaku-escape "1")) "£±")
+
+(defrule (quote (zenkaku-escape "2")) "£²")
+
+(defrule (quote (zenkaku-escape "3")) "£³")
+
+(defrule (quote (zenkaku-escape "4")) "£´")
+
+(defrule (quote (zenkaku-escape "5")) "£µ")
+
+(defrule (quote (zenkaku-escape "6")) "£¶")
+
+(defrule (quote (zenkaku-escape "7")) "£·")
+
+(defrule (quote (zenkaku-escape "8")) "£¸")
+
+(defrule (quote (zenkaku-escape "9")) "£¹")
+
+(defrule (quote (zenkaku-escape "A")) "£Á")
+
+(defrule (quote (zenkaku-escape "B")) "£Â")
+
+(defrule (quote (zenkaku-escape "C")) "£Ã")
+
+(defrule (quote (zenkaku-escape "D")) "£Ä")
+
+(defrule (quote (zenkaku-escape "E")) "£Å")
+
+(defrule (quote (zenkaku-escape "F")) "£Æ")
+
+(defrule (quote (zenkaku-escape "G")) "£Ç")
+
+(defrule (quote (zenkaku-escape "H")) "£È")
+
+(defrule (quote (zenkaku-escape "I")) "£É")
+
+(defrule (quote (zenkaku-escape "J")) "£Ê")
+
+(defrule (quote (zenkaku-escape "K")) "£Ë")
+
+(defrule (quote (zenkaku-escape "L")) "£Ì")
+
+(defrule (quote (zenkaku-escape "M")) "£Í")
+
+(defrule (quote (zenkaku-escape "N")) "£Î")
+
+(defrule (quote (zenkaku-escape "O")) "£Ï")
+
+(defrule (quote (zenkaku-escape "P")) "£Ð")
+
+(defrule (quote (zenkaku-escape "Q")) "£Ñ")
+
+(defrule (quote (zenkaku-escape "R")) "£Ò")
+
+(defrule (quote (zenkaku-escape "S")) "£Ó")
+
+(defrule (quote (zenkaku-escape "T")) "£Ô")
+
+(defrule (quote (zenkaku-escape "U")) "£Õ")
+
+(defrule (quote (zenkaku-escape "V")) "£Ö")
+
+(defrule (quote (zenkaku-escape "W")) "£×")
+
+(defrule (quote (zenkaku-escape "X")) "£Ø")
+
+(defrule (quote (zenkaku-escape "Y")) "£Ù")
+
+(defrule (quote (zenkaku-escape "Z")) "£Ú")
+
+(defrule (quote (zenkaku-escape "a")) "£á")
+
+(defrule (quote (zenkaku-escape "b")) "£â")
+
+(defrule (quote (zenkaku-escape "c")) "£ã")
+
+(defrule (quote (zenkaku-escape "d")) "£ä")
+
+(defrule (quote (zenkaku-escape "e")) "£å")
+
+(defrule (quote (zenkaku-escape "f")) "£æ")
+
+(defrule (quote (zenkaku-escape "g")) "£ç")
+
+(defrule (quote (zenkaku-escape "h")) "£è")
+
+(defrule (quote (zenkaku-escape "i")) "£é")
+
+(defrule (quote (zenkaku-escape "j")) "£ê")
+
+(defrule (quote (zenkaku-escape "k")) "£ë")
+
+(defrule (quote (zenkaku-escape "l")) "£ì")
+
+(defrule (quote (zenkaku-escape "m")) "£í")
+
+(defrule (quote (zenkaku-escape "n")) "£î")
+
+(defrule (quote (zenkaku-escape "o")) "£ï")
+
+(defrule (quote (zenkaku-escape "p")) "£ð")
+
+(defrule (quote (zenkaku-escape "q")) "£ñ")
+
+(defrule (quote (zenkaku-escape "r")) "£ò")
+
+(defrule (quote (zenkaku-escape "s")) "£ó")
+
+(defrule (quote (zenkaku-escape "t")) "£ô")
+
+(defrule (quote (zenkaku-escape "u")) "£õ")
+
+(defrule (quote (zenkaku-escape "v")) "£ö")
+
+(defrule (quote (zenkaku-escape "w")) "£÷")
+
+(defrule (quote (zenkaku-escape "x")) "£ø")
+
+(defrule (quote (zenkaku-escape "y")) "£ù")
+
+(defrule (quote (zenkaku-escape "z")) "£ú")
+
+(defrule (quote (zenkaku-escape " ")) "¡¡")
+
+(defrule (quote (zenkaku-escape "!")) "¡ª")
+
+(defrule (quote (zenkaku-escape "@")) "¡÷")
+
+(defrule (quote (zenkaku-escape "#")) "¡ô")
+
+(defrule (quote (zenkaku-escape "$")) "¡ð")
+
+(defrule (quote (zenkaku-escape "%")) "¡ó")
+
+(defrule (quote (zenkaku-escape "^")) "¡°")
+
+(defrule (quote (zenkaku-escape "&")) "¡õ")
+
+(defrule (quote (zenkaku-escape "*")) "¡ö")
+
+(defrule (quote (zenkaku-escape "(")) "¡Ê")
+
+(defrule (quote (zenkaku-escape ")")) "¡Ë")
+
+(defrule (quote (zenkaku-escape "-")) "¡Ý")
+
+(defrule (quote (zenkaku-escape "=")) "¡á")
+
+(defrule (quote (zenkaku-escape "`")) "¡®")
+
+(defrule (quote (zenkaku-escape "\\")) "¡ï")
+
+(defrule (quote (zenkaku-escape "|")) "¡Ã")
+
+(defrule (quote (zenkaku-escape "_")) "¡²")
+
+(defrule (quote (zenkaku-escape "+")) "¡Ü")
+
+(defrule (quote (zenkaku-escape "~")) "¡±")
+
+(defrule (quote (zenkaku-escape "[")) "¡Î")
+
+(defrule (quote (zenkaku-escape "]")) "¡Ï")
+
+(defrule (quote (zenkaku-escape "{")) "¡Ð")
+
+(defrule (quote (zenkaku-escape "}")) "¡Ñ")
+
+(defrule (quote (zenkaku-escape ":")) "¡§")
+
+(defrule (quote (zenkaku-escape ";")) "¡¨")
+
+(defrule (quote (zenkaku-escape "\"")) "¡É")
+
+(defrule (quote (zenkaku-escape "'")) "¡Ç")
+
+(defrule (quote (zenkaku-escape "<")) "¡ã")
+
+(defrule (quote (zenkaku-escape ">")) "¡ä")
+
+(defrule (quote (zenkaku-escape "?")) "¡©")
+
+(defrule (quote (zenkaku-escape "/")) "¡¿")
+
+(defrule (quote (zenkaku-escape ",")) "¡¤")
+
+(defrule (quote (zenkaku-escape ".")) "¡¥")
+
+(defvar digit-characters (quote ("1" "2" "3" "4" "5" "6" "7" "8" "9" "0")))
+
+(defvar symbol-characters (quote (" " "!" "@" "#" "$" "%" "^" "&" "*" "(" ")" "-" "=" "`" "\\" "|" "_" "+" "~" "[" "]" "{" "}" ":" ";" "\"" "'" "<" ">" "?" "/" "," ".")))
+
+(defvar downcase-alphabets (quote ("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")))
+
+(defvar upcase-alphabets (quote ("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z")))
+
+(defrule (quote (hankaku-escape digit-characters)) (quote (digit-characters)))
+
+(defrule (quote (hankaku-escape symbol-characters)) (quote (symbol-characters)))
+
+(defrule (quote (hankaku-escape downcase-alphabets)) (quote (downcase-alphabets)))
+
+(defrule (quote (hankaku-escape upcase-alphabets)) (quote (upcase-alphabets)))
+
+(defrule "z1" "¡û")
+
+(defrule "z!" "¡ü")
+
+(defrule "z2" "¢¦")
+
+(defrule "z@" "¢§")
+
+(defrule "z3" "¢¤")
+
+(defrule "z#" "¢¥")
+
+(defrule "z4" "¢¢")
+
+(defrule "z$" "¢£")
+
+(defrule "z5" "¡þ")
+
+(defrule "z%" "¢¡")
+
+(defrule "z6" "¡ù")
+
+(defrule "z^" "¡ú")
+
+(defrule "z7" "¡ý")
+
+(defrule "z&" "¡ò")
+
+(defrule "z8" "¡ñ")
+
+(defrule "z*" "¡ß")
+
+(defrule "z9" "¡é")
+
+(defrule "z(" "¡Ú")
+
+(defrule "z0" "¡ê")
+
+(defrule "z)" "¡Û")
+
+(defrule "z-" "¡Á")
+
+(defrule "z_" "¡è")
+
+(defrule "z=" "¡â")
+
+(defrule "z+" "¡Þ")
+
+(defrule "z\\" "¡À")
+
+(defrule "z|" "¡Â")
+
+(defrule "z`" "¡­")
+
+(defrule "z~" "¡¯")
+
+(defrule "zq" "¡Ô")
+
+(defrule "zQ" "¡Ò")
+
+(defrule "zw" "¡Õ")
+
+(defrule "zW" "¡Ó")
+
+(defrule "zr" "¡¹")
+
+(defrule "zR" "¡¸")
+
+(defrule "zt" "¡º")
+
+(defrule "zT" "¡ø")
+
+(defrule "zp" "¢©")
+
+(defrule "zP" "¢¬")
+
+(defrule "z[" "¡Ø")
+
+(defrule "z{" "¡Ì")
+
+(defrule "z]" "¡Ù")
+
+(defrule "z}" "¡Í")
+
+(defrule "zs" "¡³")
+
+(defrule "zS" "¡´")
+
+(defrule "zd" "¡µ")
+
+(defrule "zD" "¡¶")
+
+(defrule "zf" "¡·")
+
+(defrule "zF" "¢ª")
+
+(defrule "zg" "¡¾")
+
+(defrule "zG" "¡½")
+
+(defrule "zh" "¢«")
+
+(defrule "zj" "¢­")
+
+(defrule "zk" "¢¬")
+
+(defrule "zl" "¢ª")
+
+(defrule "z;" "¡«")
+
+(defrule "z:" "¡¬")
+
+(defrule "z'" "¡Æ")
+
+(defrule "z\"" "¡È")
+
+(defrule "zx" ":-")
+
+(defrule "zX" ":-)")
+
+(defrule "zc" "¡»")
+
+(defrule "zC" "¡î")
+
+(defrule "zv" "¢¨")
+
+(defrule "zV" "¡à")
+
+(defrule "zb" "¡ë")
+
+(defrule "zB" "¢«")
+
+(defrule "zn" "¡ì")
+
+(defrule "zN" "¢­")
+
+(defrule "zm" "¡í")
+
+(defrule "zM" "¢®")
+
+(defrule "z," "¡Å")
+
+(defrule "z<" "¡å")
+
+(defrule "z." "¡Ä")
+
+(defrule "z>" "¡æ")
+
+(defrule "z/" "¡¦")
+
+(defrule "z?" "¡ç")

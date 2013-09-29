@@ -1,0 +1,70 @@
+Nemacs Installation Guide
+Written by K.Handa, Electrotechnical Lab. (handa@etl.go.jp)
+
+   This file is part of Nemacs (Japanese version of GNU Emacs).
+
+   Nemacs is distributed in the forms of patches to GNU
+   Emacs under the terms of the GNU EMACS GENERAL PUBLIC
+   LICENSE which is distributed along with GNU Emacs by the
+   Free Software Foundation.
+
+   Nemacs is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+   PURPOSE.  See the GNU EMACS GENERAL PUBLIC LICENSE for
+   more details.
+
+   You should have received a copy of the GNU EMACS GENERAL
+   PUBLIC LICENSE along with Nemacs; see the file COPYING.
+   If not, write to the Free Software Foundation, 675 Mass
+   Ave, Cambridge, MA 02139, USA.
+
+
+PREPARATION
+
+0) What do you need to use Nemacs?
+	- Japanese terminal or terminal emulater on a
+	  personal computer which can show Japanese text
+	  encoded in JIS, Shift-JIS, or EUC, or
+	- Terminal emulater on some window system which can
+	  show Japanese text encoded in JIS, Shift-JIS, or
+	  EUC (such as kterm of X), or
+	- X window system Version 11 Release 2 or its later
+	  version
+
+1) Install GNU Emacs (currently version 18.55 is required),
+ and make sure that it works.  You need original code of GNU
+ Emacs to apply patch and running GNU Emacs to install
+ Nemacs (to byte-compile .el files).
+
+2) Choose a place in the file structure for residing source
+ codes of Nemacs (we call it $(NBUILD)), and copy all files
+ of GNU Emacs to $(NBUILD).  If you do not need original
+ codes of GNU Emacs, $(NBUILD) can be the directory where
+ the original codes reside.
+
+3) Apply the patch file Nemacs.diff at $(NBUILD) by 'patch
+ -p1' command.
+
+4) Recompile patched files in $(NBUILD)/lisp by original GNU
+ Emacs.  At first you should invoke byte-recompile-directory
+ command on $(NBUILD)/lisp and then byte-compile-file on
+ $(NBUILD)/lisp/kanji.el $(NBUILD)/lisp/kinsoku.el and
+ $(NBUILD)/lisp/kanji-util.el respectively.
+
+
+BUILDING AND INSTALLATION OF NEMACS
+
+1) Install Nemacs by following the same procedure of
+ installing GNU Emacs (see a file 'INSTALL' of GNU Emacs).
+ Of course, you should skip steps 0) and 1) of the section
+ 'PREPARATION'.
+
+2) To use EGG (a Japanese inputting tool), define EGG in
+ $(NBUILD)/src/nconfig.h and modify
+ $(NBUILD)/lisp/nemacs-init.el appropriately.  You should
+ also byte-compile-file such EGG related files as
+ wnn-client.el, wnn-egg.el, wnnfns.el, and egg-rkdump.el
+ before installing Nemacs.
+
+2) Unpack contrib.tar and install what you want.

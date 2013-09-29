@@ -1,0 +1,1455 @@
+\kanjifiletype=20
+\overfullrule=0pt
+\input texinfo @c -*-texinfo-*-
+@comment %**start of header
+@c egg.texinfo version 2.24 90-Jun-6
+@setfilename egg
+@settitle たまご Version 2.24
+@comment %**end of header
+
+@titlepage
+@sp 10
+@center @titlefont{たまご Version 2.24 マニュアル}
+@sp 4
+@center  １９９０年６月
+@sp 4
+@center  錦見 美貴子
+@sp 10
+@center 電子技術総合研究所
+@end titlepage
+@synindex vr fn
+@parindent=0.0pt
+
+@c ========================================
+@node Top, 概説, (dir), (dir)
+
+@menu
+* Intro: 概説.		「たまご」とは
+* Init: 初期設定.	初期設定
+* HowToUse: 漢字入力.	「たまご」の漢字入力
+* Dict: 辞書管理.   	利用者辞書の管理
+* Customization::	カスタマイズの方法
+* Sun Key map::		Sunのファンクションキーの利用
+* 品詞::		辞書登録のヒント
+* Concepts: 概念索引.
+* Functions&Variables: 関数・変数索引.
+
+下位ノード
+概説
+* Config: 動作環境.
+初期設定
+* System: システム. 	「たまご」システムの読み込み
+* Server: サーバ指定. 	仮名漢字変換サーバの指定
+* Dict: 辞書指定.	使用辞書の指定
+漢字入力
+* Intra: 対話式.		対話式漢字入力法
+* Batch: 一括式. 		変換機能
+* Mini: ミニバッファ入力.	minibuffer での漢字入力
+辞書管理
+* Toroku: 辞書登録.
+* Henshu: 辞書編集.	辞書項目編集
+Customization
+* global-map::		global-map の key binding の変更
+* fence-mode-map:: 	フェンスモードの key binding の変更
+* henkan-mode-map::	漢字変換モードの key binding の変更
+* Roma kana henkan::	ローマ字仮名変換法の変更
+@end menu
+
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@node 概説, 初期設定, Top, Top
+@chapter 「たまご」とは
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@c @dm @multiply@jintercharskip by 30@multiply@jasciikanjiskip by 30
+@cindex たまご[たまご]
+@cindex Nemacs
+
+「たまご」システムは Nemacs における日本語環境を提供する． Nemacs は Gnu
+Emacs を拡張し，漢字表示，コード変換などの基本機能を追加したシステムであ
+る．
+
+「たまご」は日本語文書処理と日本語入力の機能を提供する．日本語文書処理に
+は，禁則処理などの日本語に特有な処理が含まれる．日本語入力機能はネットワー
+ク仮名漢字変換サーバを利用し，ローマ字漢字変換方式の日本語入力を提供する．
+「たまご」第２版では仮名漢字変換サーバとしてWnn V3.3以降のJSERVERを使用
+する．
+
+「たまご」の名前は，「沢山/待たせて/御免なさい．」の各文節の先頭１音であ
+る「た」と「ま」と「ご」を取ったものである．EGGは「たまご」の英訳である．
+
+「たまご」 に関する提案，虫情報は tomura@@etl.go.jp まで．
+
+@menu
+* Config: 動作環境.
+@end menu
+
+@c ============================================================
+@node 動作環境, 初期設定, 概説, 概説
+@section 動作環境
+@cindex 動作環境[どうさかんきょう]
+@cindex Wnn
+
+「たまご」を動作させるには次のものが必要である．
+
+@table @bullet
+@item 漢字端末または漢字端末エミュレータ
+X window system で利用する場合は，漢字を表示するため kterm あるいは 
+Nemacsのx11termを使用する．
+@item nemacs V3.3
+「たまご」第二版では， Wnn V3 の @code{JSERVER} との通信は emacs lisp で
+実現するWnn-clientを提供する．このため「たまご」第二版は nemacs を変更す
+ることなく動作することが可能である．@refill
+@item Wnn V3.3 以降
+Wnn V3 はアステックの製品であり，Nemacsあるいは「たまご」には含まれない．
+（アステックから入手して下さい．Wnn のインストール，起動については Wnn 
+のマニュアルを見て下さい．）
+@item 「たまご」システム
+@end table
+
+「たまご」システムは次のファイルから構成される．
+
+@table @file
+@item lisp/wnn-egg.el
+「たまご」の本体
+@item lisp/wnn-client.el
+Wnn V3 とのインターフェース 
+@item lisp/egg-rk.el
+「たまご」入力文字変換システムでの標準ローマ字仮名変換方式定義ファイル
+@item lisp/egg-rk-dump.elnnn
+egg-rk.el のダンプ形式ファイル
+@item man/egg.texinfo
+このファイル
+@item lisp/egg-keymap.el
+Sun/X11 用の keymap 定義ファイル
+@item src/wnnfns.c
+WnnV3およびWnnV4とEmacslispとのインターフェース
+@item lisp/wnnfns-supprt.el
+wnnfns.cの支援パッケージ
+@end table
+
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@node 初期設定, 漢字入力, 概説, Top
+@chapter  初期設定
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@cindex 初期設定[しょきせってい]
+
+「たまご」の初期設定は次の２つのファイルで行なう．
+
+@table @asis
+@item emacsの初期設定ファイル @file{~/.emacs}
+「たまご」システムの読み込みと仮名漢字変換サーバホストの指定を行なう．
+@item 「たまご」の初期設定ファイル 
+仮名漢字変換サーバが使用する辞書の指定を行なう．（@pxref{辞書指定}）
+@end table
+
+@menu
+* System: システム. 	「たまご」システムの読み込み
+* Server: サーバ指定. 	仮名漢字変換サーバの指定
+* Dict: 辞書指定.	使用辞書の指定
+@end menu
+
+@c -------------------------------------------------------------------------
+@node システム, サーバ指定, 初期設定, 初期設定
+@section 「たまご」システムの読み込み
+@c -------------------------------------------------------------------------
+
+「たまご」を使うためには，以下のどちらかの方法で指定ファイルを読み込む．
+
+@enumerate
+@item
+@file{nemacs-init.el}の中で読み込みを行なった状態の @file{xemacs}を作る
+@item
+利用者がnemacsの起動時に@file{~/.emacs}の中で読み込みを行なう．
+（@file{nemacs-init.el}で読み込みが行なわれている場合は，@file{~/.emacs}で読
+み込む必要はない．）@refill
+@end enumerate
+
+読み込むファイルは以下のものである．
+
+@file{nconfig.h}で WNN3 または WNN4V3 を指定した場合
+@itemize @bullet
+@item
+"wnn-client"
+@item
+"wnn-egg"
+@item
+"egg-rk-dump"
+@end itemize
+
+それ以外の場合
+@itemize @bullet
+@item
+"wnn-egg"
+@item
+"wnnfns"
+@item
+"egg-rk-dump"
+@end itemize
+
+
+さらにSun/X11を使用する場合には，次のファイルを読み込むとSun のファンク
+ションキーが利用可能となる．（@pxref{Sun Key map}）
+
+@example
+(load "egg-keymap")
+@end example
+
+@c -------------------------------------------------------------------------
+@node サーバ指定, 辞書指定, システム, 初期設定
+@section 仮名漢字変換サーバの指定
+@c -------------------------------------------------------------------------
+@cindex 仮名漢字変換サーバ[かなかんじへんかんさーば]
+@findex wnn-host-name
+@findex disconnect-wnn
+@findex set-wnn-host-name
+
+仮名漢字変換サーバが動作しているホストの名前は変数 @code{wnn-host-name} 
+または環境変数 @code{JSERVER}に文字列で指定する．ホストの指定がされてい
+ない場合，または @code{nil} が指定されている場合は local host が指定され
+たとみなす．@refill
+
+仮名漢字サーバホストを変更するには，@kbd{M-x set-wnn-host-name}を実行し
+て新しいサーバホストを指定する．@refill
+
+@defvar wnn-host-name
+仮名漢字変換サーバホスト名を文字列で指定する．値が@code{nil}の場合は，ロー
+カルホストを指定しているものとみなす．たとえば，仮名漢字サーバーホストが 
+@code{TAISHO} の場合，@file{~/.emacs}に次の行を追加する．
+@example
+(setq wnn-host-name "TAISHO" )
+@end example
+@end defvar
+
+@deffn Command disconnect-wnn
+仮名漢字変換サーバとのコネクションを解放する．
+@end deffn
+
+@deffn Command set-wnn-host-name host-name
+仮名漢字変換サーバホストを設定する．
+@end deffn
+
+@c -------------------------------------------------------------------------
+@node 辞書指定, 漢字入力, サーバ指定, 初期設定
+@section 使用辞書の指定
+@c -------------------------------------------------------------------------
+@cindex 辞書[じしょ]
+@cindex システム辞書[しすてむじしょ]
+@cindex 利用者辞書[りようしゃじしょ]
+@cindex 頻度ファイル[ひんどふぁいる]
+@findex egg-startup-file-name
+@findex egg-startup-file-search-path
+@findex egg-default-startup-file-name
+@findex set-default-sys-dic-directory
+@findex set-default-usr-dict-directory 
+@findex setsysdic
+@findex setusrdic
+
+以下では nemacsのシステムディレクトリを@file{$NEMACS}で示す．@refill
+
+「たまご」は仮名漢字変換サーバとの通信を開始すると初期設定ファイルを探索
+実行して環境設定を行なう．初期設定ファイルの探索はまず
+@code{egg-startup-file-name}と@code{egg-startup-file-search-path}を用い
+て行なう．見つからない場合は@code{egg-default-startup-file-name}と
+@code{load-path}を用いて探索する．@code{egg-startup-file-name}の標準設定
+は@file{.eggrc}である．@refill
+
+site で使用する標準初期設定ファイルは WNN3の場合は 
+@file{$NEMACS/lisp/eggrc-v3}，WNN4V3 の場合には
+@file{$NEMACS/lisp/eggrc-v4}である．@refill
+
+初期設定ファイルでは，仮名漢字変換サーバが使用する辞書の設定を行なう．
+Wnn V3 の辞書にはシステム辞書，利用者辞書の２種類がある．システム辞書の
+内容は変更できない．利用者辞書は内容の変更が可能である．システム辞書の利
+用頻度情報は，辞書とは別の頻度ファイルに記憶する．利用者辞書の頻度情報は，
+辞書に記憶する．
+
+辞書・頻度ファイルの管理は次の２つのディレクトリに分けて行なう．
+@enumerate
+@item
+システム共通のシステム辞書を置くシステム辞書ディレクトリ
+@item
+利用者毎に異なる，システム辞書の頻度ファイルと利用者辞書を置く利用者辞書
+ディレクトリ
+@end enumerate
+
+@defvar egg-startup-file-name
+初期設定ファイルの名前を指定する．
+@end defvar
+
+@defvar egg-startup-file-search-path
+探索を行なうディレクトリのリストを指定する．@code{egg-startup-file-name}
+がディレクトリを指定していない場合はこの探索パス上のファイルを探す．
+@end defvar
+
+@defvar egg-default-startup-file-name
+site で共通に使用する初期設定ファイルを指定する．ファイル名がディレクト
+リを指定していない場合は@code{load-path}上のファイルを探す．
+@end defvar
+
+@defun set-default-sys-dic-directory directory
+システム辞書ディレクトリとして @var{directory} を指定する．
+@example
+(set-default-sys-dic-directory "/usr/local/lib/dic/sys/")
+@end example
+@end defun
+
+@defun set-default-usr-dict-directory directory
+利用者辞書ディレクトリとして @var{directory} を指定する．
+@example
+(set-default-usr-dic-directory "/usr/local/lib/dic/usr/$USER/")
+@end example
+@end defun
+
+@c （注意1）この例で使用した "/usr/local/lib/dic/sys/"
+@c  "/usr/local/lib/dic/usr/$USER/" はsite毎に異なります． 各site のWnn 担当
+@c  者に確認して下さい．
+
+@c （注意2）これらのディレクトリはJSERVERが動いているホストのrootプロセスで
+@c  書き込めるディレクトリでなければなりません（Wnn V3の場合）．ただし利用者
+@c  からアクセスできる必要はありません．
+
+@defun setsysdic jisho hindo priority &optional flag
+システム辞書 @var{jisho} を優先順位 @var{priority}で使用し，このシステム
+辞書の頻度ファイルに @var{hindo} を指定する．@var{jisho},@var{hindo}が絶
+対パス名（@file{/}で始まるパス名）でない場合はパス名の先頭にシステム辞書
+ディレクトリを追加したパス名を使用する．@var{flag}が@code{t}でない場合は
+@var{jindo}のパス名に拡張子@file{.sys}と，また@var{hindo}のパス名に拡張
+子@file{.hindo}を追加する．@refill
+
+@example
+(setsysdic "pd-kihon" "pd-kihon" 5)
+(setsysdic "kihon.sysdic" "kihon.freq" 5 t)
+@end example
+@end defun
+
+@defun setusrdic jisho hindo priority &optional flag
+利用者辞書 @var{jisho} を優先順位 @var{priority} で使用することを指定す
+る．@var{jisho}が絶対パス名（@file{/}で始まるパス名）でない場合はパス名
+の先頭に利用者辞書ディレクトリを追加したパス名を使用する．@var{flag}が
+@code{t}でない場合は@var{jindo}のパス名に拡張子@file{.usr}を追加する．
+@refill
+
+@code{setsysdic}, @code{setusrdic} の使い方はWnnの@file{.wnnrc}と同様で
+ある．@code{setsysdic}はシステム辞書と頻度ファイルを指定し，
+@code{setusrdic}は利用者辞書を指定する．@refill
+
+@example
+(setusrdic "my-dict" 5)
+(setusrdic "our-dict.dat"  5 t)
+@end example
+@end defun
+
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@node 漢字入力, 辞書管理, 初期設定, Top
+@chapter 「たまご」 の漢字入力
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@cindex 漢字入力[かんじにゅうりょく]
+
+「たまご」の漢字入力方法には次の２種類がある．
+
+@enumerate
+@item
+uum と同様な対話式漢字入力方法
+@item
+emacs の@kbd{M-x}コマンドによる一括変換方法
+@end enumerate
+
+@menu
+* Intra: 対話式.		対話式漢字入力法
+* Batch: 一括式. 		変換機能
+* Mini: ミニバッファ入力.	minibuffer での漢字入力
+@end menu
+
+@c --------------------------------------------------------------------------
+@node 対話式, 一括式, 漢字入力, 漢字入力
+@section  対話式漢字入力法
+@c --------------------------------------------------------------------------
+
+@cindex 対話式漢字入力[たいわしきかんじにゅうりょく]
+対話式漢字入力には次の２つの機能がある．
+
+@itemize @bullet
+@item
+仮名漢字変換サーバを使用しない入力文字変換機能(通常ローマ字仮名変換を行
+なう)
+@item
+仮名漢字変換サーバを使用する仮名漢字変換機能
+@end itemize
+
+対話式漢字入力では，以下の４つのモードを移動しながら入力を行なう．
+
+@menu
+* trans: 透過モード. 	透過モード
+* romakana:  ローマ字仮名モード.  	ローマ字仮名モード
+* fence: フェンスモード. 		フェンスモード
+* kanji: 変換モード. 		漢字変換モード
+@end menu
+
+@c --------------------------------------------------------------------------
+@node 透過モード, ローマ字仮名モード, 対話式, 対話式
+@subsection 透過モード
+@c --------------------------------------------------------------------------
+
+@cindex 透過モード[とうかもーど]
+
+Nemacs を起動し，「たまご」システムがロードされるとモードラインが次のよ
+うに表示される．このときのモードが透過モードである．
+
+@example
+[----] ---- NEmacs: *scratch*         (Lisp Interaction)---All---[JJJ-]
+ ^^^^
+@end example
+
+透過モードは通常のNemacsと同じ機能を持つ．
+
+（注意）立ちあげた時に @code{Error in init file} というエラーメッセージ
+が minibufferに表示される時は，@file{$NEMACS/lisp/egg.elc}か，
+@file{$NEMACS/lisp/egg-rk-dump.elc}が無いことが考えられる．この
+場合には，Nemacsの担当者に連絡する．@refill
+
+透過モードを含むすべてのモードで，@kbd{C-^}（コマンド
+@strong{special-symbol-input}）によって特殊記号を含む記号入力を行なうこ
+とができる．ミニバッファに表示されるメニュー中から，記号の種類，記号を順
+に@kbd{RET}によって選択する．@refill
+
+@c --------------------------------------------------------------------------
+@node ローマ字仮名モード, フェンスモード, 透過モード, 対話式
+@subsection ローマ字仮名モード
+@c --------------------------------------------------------------------------
+
+@cindex ローマ字仮名モード[ろーまじかなもーど]
+@cindex フェンス[ふぇんす]
+@findex  set-egg-fence-mode-format
+@findex  toggle-egg-code
+
+透過モードで @kbd{C-\} （コマンド@strong{toggle-egg-mode}）を打つと，ロー
+マ字仮名モードに入り，モードラインが次のように変わる．@refill
+
+@example
+[ aあ] ---- NEmacs: *scratch*          (Lisp Interaction)---All---[JJJ-]
+ ^^^^
+@end example
+
+透過モードに戻るには，もう一度@kbd{C-\}を打つ．@refill
+
+ローマ字仮名モードでのコントールキーやメタキーは通常の意味を持つので，カー
+ソル移動などは，このモードのままで実行できる．通常文字を入力するとカーソ
+ルの位置に縦棒 @kbd{|} ２つが現れ，その間に入力をローマ字仮名変換したひ
+らがなが表示される．Wnnでおなじみの変換例，「私の名前は中野です」のロー
+マ字表記@refill
+
+@example
+watasinonamaehanakanodesu
+@end example
+
+を入力すると
+
+@example
+|わたしのなまえはなかのです|
+@end example
+
+と変換されて表示される．この縦棒をフェンスと呼び，この状態をフェンスモー
+ドという．フェンスモードを示す方法（縦棒など）は，コマンド
+@strong{set-egg-fence-mode-format}で変えることができる．
+
+@deffn Command set-egg-fence-mode-format OPEN CLOSE &optional ATTR
+OPEN,CLOSEはそれぞれ領域の始点と終点を示す文字列．ATTRはフェンス領域に設
+定されるattribute（x11termでのみ有効）．標準の状態では，@refill @*
+@code{(set-egg-fence-mode-format "|" "|" nil)}になっている．@refill
+@end deffn
+
+@deffn Command toggle-egg-code
+透過モードとフェンスモードの切替を行なう．
+フェンスモード中では，ローマ字かな入力モードと半角入力モードを切替える．
+@end deffn
+
+@c --------------------------------------------------------------------------
+@node フェンスモード, 変換モード, ローマ字仮名モード, 対話式
+@subsection フェンスモード
+@c --------------------------------------------------------------------------
+
+@cindex フェンスモード[ふぇんすもーど]
+@cindex １６進入力[１６しんにゅうりょく]
+フェンスモードでは文字入力とフェンスモード編集コマンドによる編集のみが行
+なえる．フェンスモードでは以下の編集コマンドが使用できる．
+
+@table @kbd
+@item ! .. ~
+ローマ字を仮名に変換
+@item @key{SPC}
+仮名漢字変換開始
+@item C-@@
+仮名漢字変換開始
+@item C-a
+フェンス内の先頭の文字へ移動
+@item C-b
+fence内で一文字分前へ
+@item C-c
+入力を中止し，フェンスモードから抜ける
+@item C-d
+一文字削除
+@item C-e
+フェンス内の最後の文字へ移動
+@item C-f
+fence内で一文字分後ろへ
+@item C-g
+入力をcancelし，フェンスモードから抜ける
+@item C-k
+フェンス内のカーソルから後ろを削除
+@item C-l
+フェンス内の入力を確定し，フェンスモードから抜ける
+@item RET
+フェンス内の入力を確定し，フェンスモードから抜ける
+@item C-T
+フェンス内の文字の転置
+@item C-W
+仮名漢字変換開始
+@item C-_
+JIS コード入力
+@item M-h
+フェンス内の文字をひらがなにする（コマンド@strong{fence-hiragana}）
+@item M-k
+フェンス内の文字をカタカナにする（コマンド@strong{fence-katakana}）
+@item M->
+フェンス内の文字を全角文字にする（コマンド@strong{fence-zenkaku}）
+@item M-<
+フェンス内の文字を半角文字にする（コマンド@strong{fence-hankaku}）
+@end table
+
+フェンスモードで@kbd{C-\} をタイプすると半角入力モードに切り替わり，半角
+文字が入力できる．もう１度@kbd{C-\} を叩くとローマ字仮名モードに戻る．
+@refill
+
+モードラインは
+@example
+[ a a] ---- NEmacs: *scratch*          (Lisp Interaction)---All---[JJJ-]
+ ^^^^
+@end example
+
+となる．
+
+フェンスモードでJIS codeを直接入力するには@kbd{C-_}（コマンド
+@strong{jis-code-input}と打つ．minibuffer に @code{JIS code:}@: と表示さ
+れ，１６進数入力を受け付ける．@refill
+
+@ifinfo
+@deffn Command toggle-egg-code
+透過モードとフェンスモードの切替を行なう．
+フェンスモード中では，ローマ字かな入力モードと半角入力モードを切替える．
+@end deffn
+@end ifinfo
+
+@c --------------------------------------------------------------------------
+@node 変換モード, 変換コマンド, フェンスモード, 対話式
+@subsection 漢字変換モード
+@c --------------------------------------------------------------------------
+
+@cindex 漢字変換モード[かんじへんかんもーど]
+@cindex 仮名漢字変換[かなかんじへんかん]
+@cindex JSERVER
+フェンスモードでは，@kbd{C-w}，@kbd{C-@@}，@kbd{SPC}のいづれかによって，
+漢字変換モードに入り，仮名漢字変換が開始される．モードラインは次のように
+なる．@refill
+
+@example
+[漢字] ---- NEmacs: *scratch*          (Lisp Interaction)---All---[JJJ-]
+ ^^^^
+@end example
+
+
+仮名漢字モードに入った時初めて，「たまご」はJSERVERとのコネクションを開
+き，
+
+@example
+ホスト etlcom のJSERVERを起動しました．
+@end example
+
+という message を minibuffer に表示し，辞書設定のために@file{.eggrc}を読
+み込む．頻度情報ファイルや個人辞書がない場合はそれらを作成するかどうかを
+質問する．@refill
+
+もしJSERVERが動いていないと，
+
+@example
+etlcom 上にJSERVERがありません．
+@end example
+
+というerror messageをminibufferに表示する．（この場合にはホストのWnn担当
+者に連絡をしてJSERVERを起動してもらって下さい．）
+
+「たまご」からの message はすべて @code{*Notification*} という buffer に
+保存される．@kbd{M-x select-notification} を実行すると選択される．@refill
+
+@node   変換コマンド, メニュー選択, 変換モード, 変換モード
+@subsubsection 変換コマンド
+
+@cindex 仮名漢字変換コマンド[かなかんじへんかんこまんど]
+@findex set-egg-henkan-mode-format
+
+変換モードでは以下のコマンドが使用できる．
+
+@table @kbd
+@item @key{SPC}
+次候補を表示する
+@item C-@key{SPC}
+次候補を表示する
+@item C-a
+先頭文節へカーソルを移動する
+@item C-b
+直前の文節へカーソルを移動する
+@item C-c
+変換を中止し，仮名モードにもどる
+@item C-e
+最終文節へカーソルを移動する
+@item C-f
+直後の文節へカーソルを移動する
+@item C-g
+漢字変換モードを中止する
+@item C-h
+漢字変換モードコマンドを表示する
+@item C-i
+文節の長さを短くする
+@item C-k
+カーソルのある文節より前を確定し，カーソルを含む文節以降を仮名モードに戻す
+@item C-l
+すべての変換を確定する
+@item @key{RET}
+すべての変換を確定する
+@item C-n
+次候補を表示する
+@item C-o
+文節の長さを長くする
+@item C-p
+前候補表示する
+@item M-s
+変換候補一覧をミニバッファに表示し，選択可能にする（コマンド
+@strong{henkan-select-kouho}）
+@item M-h
+文節をひらがなにする（コマンド@strong{henkan-hiragana}）
+@item M-i
+文節の変換情報を表示する（コマンド@strong{henkan-inspect-bunsetu}）
+@item M-k
+文節をカタカナにする（コマンド@strong{henkan-katakana}）
+@item M-<
+文節の長さを最大にする（コマンド@strong{henkan-saichou-bunsetu}）
+@item M->
+文節の長さを最小にする（コマンド@strong{henkan-sanshou-bunsetu}）
+@end table
+
+例をみてみよう．
+
+@example
+|私のな 前は 中野です|
+@end example
+
+各文節は，一個の半角空白で区切られる．（変換モードでの表示の方法は，コマ
+ンド@strong{set-egg-henkan-mode-format}で変更できる．）変換間違いは文節
+毎に再変換して修正する．文節の切り方が間違っている場合は，@kbd{C-i}によっ
+てカーソルのある文節を短くするか，@kbd{C-o}によってカーソルがある文節を
+長くして修正する．
+@refill
+
+文節毎の再変換は，@kbd{C-@@} ，@kbd{SPC} または@kbd{C-n}によって次候補を
+出す，@kbd{C-p}によって直前の候補を出す，@kbd{M-s} によって minibuffer 
+で候補一覧から選ぶなどの方法で行なう．複数の候補一覧がある場合は，
+@kbd{C-n}で次の候補一覧が，また@kbd{C-p}で前の候補一覧が表示される．
+@kbd{C-f}でカーソルが次候補に，@kbd{C-b}でカーソルが前の候補に移動する．
+候補決定には@key{RET}，候補一覧の状態から抜けるには@kbd{C-g}をタイプすれ
+ばよい．@refill
+
+ひらがな入力が間違っている場合には，@kbd{C-c}を叩くと，ひらがな入力状態
+に戻る．また先頭のいくつかの文節を確定し，残りの部分をひらがなに戻して編
+集するには，@kbd{C-k}をタイプすると，カーソルのいる文節の直前までが確定
+し，残りがひらがなに戻る．@refill
+
+@deffn Command set-egg-henkan-mode-format OPEN CLOSE KUGIRI &optional ATTR1 ATTR2
+変換モードの表示方法を設定する．OPEN,CLOSE,KUGIRIはそれぞれ変換の始点，
+終点，文節区切りを示す文字列あるいはnil．ATTR1,ATTR2はそれぞれ変換区間，
+文節区間に設定される属性あるいはnil（x11termでのみ有効）．標準の状態では，
+@* @refill
+@code{(set-egg-henkan-mode-format "|" "|" " " nil nil)}である．
+@end deffn
+@ignore
+
+モード遷移図：
+
+		     ############################################
+                     #                                          #
+		     #			C-\			#
+		     #	      +<---<---<---<---<-----+		#
+        +---->---->--#	      |			     ^		#
+        ^            #	      V		C-\          |		#
+	|            # ローマ字仮名モード--->--->透過モード	#
+        |            #    [ aあ] (1)              [----] (2)	#
+        ^            #       |                                  #
+	|            ########|###################################
+	|		     V
+	|		     |ローマ字を入力すると，
+	^		     | フェンスが現れます．
+	|	Fence mode   V
+	|	     ########|###################################
+	|	     #	     |          			#
+	^	     #	     V		  C-\         		#
+	|	     # ローマ字仮名モード--->---半角入力モード	#
+	+<---<---<---#    [ aあ] (3)              [ a a] (4)	#
+        ^            #       ^                       |          #
+        |            #       |        C-\            V          #
+	|	     #	     +<---<---<---<---<---<--+		#
+        |            #                                          #
+	|	     ############################################
+	^				|
+	|				|C-w
+	|		C-l		V
+	+<---<---<---<---<---<<---漢字編集モード
+				      [漢字] (5)
+
+
+モード別利用可能コマンド一覧；
+
+   State 1: [ aあ] ： ローマ字を入力するとフェンスモードになる．
+
+   State 2: [----] ： 通常のnemacsと同じ．
+
+   State 3: [ aあ] ： フェンスモードでのひらがな入力．
+
+@end ignore
+
+
+@ignore
+   State 4: [ a a]  ： フェンスモードでの半角入力．
+
+SPC .. ~ その文字自身を挿入する．
+C-@	仮名漢字変換開始
+C-a	fenceの先頭へ移動
+C-b	fence内で一文字分前へ
+C-c	入力をcancelし，fence modeから抜ける．
+C-d	一文字削除
+C-e	fenceの最後へ移動
+C-f	fence内で一文字分後ろへ
+C-g	入力をcancelし，fence modeから抜ける．
+C-k	fence内のカーソルから後ろを削除
+C-l	fence内の入力し，fence modeから抜ける．
+RET	fence内の入力し，fence modeから抜ける．
+C-T	fence内の文字の転置
+C-W	仮名漢字変換開始
+C-_     JIS コード入力
+
+   State 5: [漢字]  ： 漢字変換モード
+
+@end ignore
+
+@node メニュー選択, 一括式, 変換コマンド, 変換モード
+@subsubsection メニューの選択法
+
+minibuffer を利用したメニューシステムでの変換候補の選択方法は次の通りで
+ある．
+
+@table @kbd
+@item C-n
+次の候補一覧
+@item C-p
+前の候補一覧
+@item C-f
+カーソルを次の候補に移動
+@item C-b
+カーソルを前の候補に移動
+@item C-g
+メニュー選択を中止する
+@item RET
+カーソルのいる項目を選択する
+@end table
+
+@c -------------------------------------------------------------------------
+@node 一括式, 辞書管理, 対話式, 漢字入力
+@section 一括変換機能
+@c -------------------------------------------------------------------------
+
+@cindex 一括式変換[いっかつしきへんかん]
+@menu
+* JIS: JIS 入力.
+* Zenkaku: 全角変換.
+* Hankaku: 半角変換.
+* Hiragana: ひらがな変換.
+* Katanaka: カタカナ変換.
+* RomaHira: ローマ字ひらがな変換.
+* RomaKanji: ローマ字漢字変換.
+* Kanji: 漢字変換.
+@end menu
+
+@c -------------------------------------------------------------------------
+@node JIS 入力, 全角変換, 一括式, 一括式
+@subsection JISコード入力
+@c -------------------------------------------------------------------------
+
+@kbd{M-x jis-code-input}によってJISコード入力が行なえる．minibufferに
+
+@example
+JIS code: 
+@end example
+
+とプロンプトが出るので16進コードでJISコードを入力する．例えば
+
+@example
+JIS code: 2170
+@end example
+
+と入力すると，カーソルの位置に＄が表示される．（16進数の大文字・小文字の
+区別はない．）
+
+@c -------------------------------------------------------------------------
+@node 全角変換, 半角変換, JIS 入力, 一括式
+@subsection 全角変換
+@c -------------------------------------------------------------------------
+@cindex 全角変換[ぜんかくへんかん]
+以下のコマンドで英数字や記号などの半角文字を全角文字にすることができる．
+
+
+@table @kbd
+@item M-x zenkaku-region
+指定したリージョンの半角文字を全角文字にする．
+@item M-x zenkaku-word
+直後の word の半角文字を全角文字にする．
+@item M-x zenkaku-paragraph
+直後の paragraph の半角文字を全角文字にする．
+@item M-x zenkaku-sentence
+直後の sentence の半角文字を全角文字にする．
+@end table
+
+@c -------------------------------------------------------------------------
+@node 半角変換, ひらがな変換, 全角変換, 一括式
+@subsection 半角変換
+@c -------------------------------------------------------------------------
+
+@cindex 半角変換[はんかくへんかん]
+以下のコマンドで英数字や記号などの全角文字を半角文字にすることができる．
+（日本語文字などは全角のまま変換されない）
+
+@table @kbd
+@item M-x hankaku-region
+指定したリージョンの全角文字を半角文字にする．
+@item M-x hankaku-word
+直後の word の全角文字を半角文字にする．
+@item M-x hankaku-paragraph
+直後の paragraph の全角文字を半角文字にする．
+@item M-x hankaku-sentence
+直後の sentence の全角文字を半角文字にする．
+@end table
+
+@c -------------------------------------------------------------------------
+@node ひらがな変換, カタカナ変換, 半角変換, 一括式
+@subsection ひらがな変換
+@c-------------------------------------------------------------------------
+@cindex ひらがな変換[ひらがなへんかん]
+
+以下のコマンドはカタカナをひらがなに変換する．
+
+@table @kbd
+@item M-x hiragana-region
+指定したリージョンのカタカナをひらがなにする．
+@item M-x hiragana-word
+直後の word のカタカナをひらがなにする．
+@item M-x hiragana-paragraph
+直後の paragraph のカタカナをひらがなにする．
+@item M-x hiragana-sentence
+直後の sentence のカタカナをひらがなにする．
+@end table
+
+@c -------------------------------------------------------------------------
+@node カタカナ変換, ローマ字ひらがな変換, ひらがな変換, 一括式
+@subsection カタカナ変換
+@c -------------------------------------------------------------------------
+
+@cindex カタカナ変換[かたかなへんかん]
+以下のコマンドはひらがなをカタカナに変換する．
+
+@table @kbd
+@item M-x katakana-region
+指定したリージョンのひらがなをカタカナにする．
+@item M-x katakana-word
+直後の word のひらがなをカタカナにする．
+@item M-x katakana-paragraph
+直後の paragraph のひらがなをカタカナにする．
+@item M-x katakana-sentence
+直後の sentence のひらがなをカタカナにする．
+@end table
+
+@c -------------------------------------------------------------------------
+@node ローマ字ひらがな変換, ローマ字漢字変換, カタカナ変換, 一括式
+@subsection ローマ字ひらがな変換
+@c -------------------------------------------------------------------------
+
+@cindex ローマ字ひらがな変換[ろーまじひらがなへんかん]
+以下のコマンドはローマ字をひらがなに変換する．
+
+例えばローマ字文字列
+@example
+koreharo-majidesu.
+@end example
+はひらがな文字列
+@example
+これはろーまじです．
+@end example
+に変換される．
+
+@table @kbd
+@item M-x roma-kana-region
+指定したリージョンのローマ字をひらがなにする．
+@item M-x roma-kana-word
+直後の word のローマ字をひらがなにする．
+@item M-x roma-kana-paragraph
+直後の paragraph のローマ字をひらがなにする．
+@item M-x roma-kana-sentence
+直後の sentence のローマ字をひらがなにする．
+@end table
+
+@c -------------------------------------------------------------------------
+@node ローマ字漢字変換, 漢字変換, ローマ字ひらがな変換, 一括式
+@subsection ローマ字漢字変換
+@c -------------------------------------------------------------------------
+
+@cindex ローマ字漢字変換[ろーまじかんじへんかん]
+以下のコマンドはローマ字を漢字に変換する．
+
+@table @kbd
+@item M-x roma-kanji-region
+指定したリージョンのローマ字を漢字にする．
+@item M-x roma-kanji-word
+直後の word のローマ字を漢字にする．
+@item M-x roma-kanji-paragraph
+直後の paragraph のローマ字を漢字にする．
+@item M-x roma-kanji-sentence
+直後の sentence のローマ字を漢字にする．
+@end table
+
+例えばローマ字文字列
+@example
+watashino namaeha nakano desu.
+@end example
+は，
+@example
+|私のな 前は 中野です|
+@end example
+になり，漢字変換モードに入る．（リージョン内の空白文字は削除される．）
+
+@c -------------------------------------------------------------------------
+@node 漢字変換, ミニバッファ入力, ローマ字漢字変換, 一括式
+@subsection 漢字変換
+@c -------------------------------------------------------------------------
+
+@cindex ひらがな漢字変換[ひらがなかんじへんかん]
+以下のコマンドはひらかなを漢字に変換する．
+
+@table @kbd
+@item M-x henkan-region
+指定したリージョンのひらがなを漢字にする．
+@item M-x henkan-word
+直後の word のひらがなを漢字にする．
+@item M-x henkan-paragraph
+直後の paragraph のひらがなを漢字にする．
+@item M-x henkan-sentence
+直後の sentence のひらがなを漢字にする．
+@end table
+
+例えばひらがな文字列
+@example
+わたしのなまえはなかのです．
+@end example
+は，
+@example
+|私のな 前は 中野です|
+@end example
+になり，漢字変換モードに入る．
+
+@c -------------------------------------------------------------------------
+@node ミニバッファ入力, 辞書管理, 漢字変換, 漢字入力
+@section ミニバッファでの漢字入力方法
+@c -------------------------------------------------------------------------
+
+@cindex ミニバッファ[みにばっふぁ]
+minibuffer内でも入力文字変換，仮名漢字変換ができる．buffer中と同様に
+@kbd{C-\}を打つことによってローマ字仮名モードになる．モードは全ての
+buffer のモードラインに@code{m}（for Minibuffer）が先頭についた形で表示
+される．@refill
+
+@example
+m[ aあ]-----NEmacs: wnn-egg.el         (Emacs-Lisp)---- 3%---[JJJ-]
+^ ^^^^
+@end example
+
+@c -------------------------------------------------------------------------
+@node 辞書管理, Customization, 漢字入力, Top
+@chapter  利用者辞書管理
+@c -------------------------------------------------------------------------
+
+@cindex 利用者辞書[りようしゃじしょ]
+「たまご」は，利用者辞書の管理を行なうために，辞書登録と辞書編集の２つの
+機能を提供する．
+
+@menu
+* Toroku: 辞書登録.
+* Henshu: 辞書編集.	辞書項目編集
+@end menu
+
+@c -------------------------------------------------------------------------
+@node 辞書登録, 辞書編集, 辞書管理, 辞書管理
+@section  辞書登録
+@c -------------------------------------------------------------------------
+
+@cindex 辞書登録[じしょとうろく]
+@findex toroku-region
+「たまご」ではbuffer中の文字列を用いて利用者辞書に単語を登録できる．
+
+@deffn Command toroku-region start end yomi hinshi jisho
+リージョン(@var{start},@var{end})で指定された登録文字列を読み文字列
+@var{yomi}で品詞@var{hinshi}の語として辞書@var{jisho}に登録する．
+@end deffn
+
+例えば，buffer中の『電子技術総合研究所』という単語を辞書に登録する手順は
+次のようになる．
+
+@enumerate
+@item
+登録文字列を指定する．登録する語の範囲をリージョンで指定し，@kbd{M-X
+toroku-region}を実行する．
+@item 
+読みを指定する．minibufferに
+@example
+辞書登録『電子技術総合研究所』 読み：
+@end example
+が表示される．読みをローマ字で入力し（自動的にひらがなに変換する）
+@key{RET}で読みの入力を終了する．
+@item
+品詞を指定する．minibufferに品詞一覧が表示される．（@pxref{品詞}）
+@example
+品詞:  0.名詞  1.固有名詞  2.動詞  3.形容詞語幹  4.形容動詞語幹  5.連帯詞
+@end example
+@kbd{C-F}でカーソルが右に移動し，@kbd{C-B}でカーソルが左に移動する．
+@kbd{C-N}で次の品詞一覧が表示される．
+@example
+品詞:  0.副詞  1.接続詞・感動詞  2.接頭語  3.接尾語  4.助数詞  5.数詞  6.単漢字
+@end example
+@kbd{C-P}で前の品詞一覧に戻る．@*
+目的の品詞にカーソルを移動し，@key{RET}によって品詞を選択する．
+動詞にはいろいろな種類があるため，例えば「サ変（名詞型）語幹」を選択する
+には，まず「動詞」を選択し，次の選択リストから，「サ変（名詞型）語幹」を
+探し，選択する．@*  
+例の場合，電子技術総合研究所は固有名詞なので，「固有名詞」を選ぶ．  
+@item
+登録する辞書を指定する．同様に@kbd{C-F}, @kbd{C-B}, @kbd{C-N}, @kbd{C-P}
+等を使ってカーソルを登録したい辞書に移動し選択する．@key{RET}を打つと
+単語を登録する．@refill
+@end enumerate
+
+@c -------------------------------------------------------------------------
+@node 辞書編集, Customization, 辞書登録, 辞書管理
+@section 辞書項目編集　DicEd
+@c -------------------------------------------------------------------------
+
+@cindex 辞書編集[じしょへんしゅう]
+@findex edit-dict-item 
+現在使用している辞書の辞書項目を，読みを指定して編集することができる．
+
+@deffn Command edit-dict-item yomi
+@end deffn
+
+利用者辞書の登録項目を修正するには@kbd{M-x edit-dict-item}を入力し，
+minibuffer で項目の読みを指定する．すると @code{*Nihongo Dictionary
+Information*} というbufferが作られ，たとえば以下のように表示される．
+
+@example
+ *話 す         サ行五段語幹  辞書：pd-kihon.sys/14434 頻度：46
+ *離 す         サ行五段語幹  辞書：pd-kihon.sys/14433 頻度：18
+ *放 す         サ行五段語幹  辞書：pd-kihon.sys/14432 頻度：2
+ *はな す       サ行五段語幹  辞書：pd-kihon.sys/14428 頻度：1
+ *放 つ         タ行五段語幹  辞書：pd-kihon.sys/14432 頻度：2
+ *花            名詞          辞書：pd-kihon.sys/14429 頻度：12
+ *鼻            名詞          辞書：pd-kihon.sys/14431 頻度：4
+ *はな          名詞          辞書：pd-kihon.sys/14427 頻度：1
+ *華            名詞          辞書：pd-kihon.sys/14430 頻度：1
+ *ハナ          固有名詞      辞書：pd-jinmei.sys/1581 頻度：0
+ *塙            単漢字        辞書：pd-tankan.sys/1959 頻度：0
+@end example
+
+行頭の「*」はその辞書項目がシステム辞書に登録されていて除去できないこと
+を示す．利用者辞書に登録されている辞書項目では * の代わりに空白を表示す
+る．
+
+「話 す」は辞書項目の見出し語で，語幹（「話」）と活用語尾（「す」）とを空
+白文字で分けて表示する．  
+
+「サ行五段語幹」は辞書項目の品詞である．最後の項目は登録されている辞書名，
+項目番号，頻度である．
+
+Diced は，Diredと同様にして使用できる．通常のカーソル移動コマンドの他に
+次のコマンドが使用できる．
+
+@table @kbd
+@item  n
+カーソルを下に移動する．
+@item p
+カーソルを上に移動する．
+@item  a
+辞書項目を追加する．
+@item d
+カーソルの辞書項目を削除指定する．削除指定された辞書項目は行の先頭 
+に @code{D} を表示する．
+@item u
+削除指定された辞書項目の削除指定を解除する．
+@item x
+削除指定された辞書項目を実際に削除する．
+@item q
+編集を終了する．削除は行なわない．
+@end table
+
+
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@node Customization, Sun Key map, 辞書管理, Top
+@chapter カスタマイズ
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@menu
+* global-map::		global-map の key binding の変更
+* fence-mode-map:: 	フェンスモードの key binding の変更
+* henkan-mode-map::	漢字変換モードの key binding の変更
+* Roma kana henkan::	ローマ字仮名変換法の変更
+@end menu
+
+@c -------------------------------------------------------------------------
+@node global-map, fence-mode-map, Customization, Customization
+@section global-map の key binding の変更
+@c -------------------------------------------------------------------------
+
+「たまご」では通常使用しているglobal-mapを変更しており，元のglobal-mapは
+@code{si:*global-map*}に退避されている．
+
+「たまご」でのglobal-mapの変更点は次の通り．
+
+@enumerate
+@item
+@code{self-insert-command}を@code{egg-self-insert-command}に変更した．
+@item
+@code{(define-key global-map "\C-\\" 'toggle-egg-mode)}@*
+@code{(define-key ctl-x-map  " " 'henkan-region)}@*
+@code{(define-key global-map "\C-^" 'special-symbol-input)}@*
+を追加した．
+@end enumerate
+
+@c -------------------------------------------------------------------------
+@node fence-mode-map, henkan-mode-map, global-map, Customization
+@section フェンスモードの key binding の変更
+@c -------------------------------------------------------------------------
+
+フェンスモードの key binding の変更は通常の方法で行なう．フェンスモード
+の keymap には， @code{fence-mode-map} を使用する．デフォルトの key
+binding は次の通り．
+
+@example
+(define-key fence-mode-map "\C-@@" 'henkan-fence-region)
+(define-key fence-mode-map "\C-a" 'fence-beginning-of-line)
+(define-key fence-mode-map "\C-b" 'fence-backward-char)
+(define-key fence-mode-map "\C-c" 'fence-cancel-input)
+(define-key fence-mode-map "\C-d" 'fence-delete-char)
+(define-key fence-mode-map "\C-e" 'fence-end-of-line)
+(define-key fence-mode-map "\C-f" 'fence-forward-char)
+(define-key fence-mode-map "\C-g" 'fence-cancel-input)
+(define-key fence-mode-map "\C-h" 'help-command)
+(define-key fence-mode-map "\C-i" 'undefined)  
+(define-key fence-mode-map "\C-j" 'undefined)  ;;; LFD
+(define-key fence-mode-map "\C-k" 'fence-kill-line)
+(define-key fence-mode-map "\C-l" 'fence-exit-mode)
+(define-key fence-mode-map "\C-m" 'fence-exit-mode)  ;;; RET
+(define-key fence-mode-map "\C-n" 'undefined)
+(define-key fence-mode-map "\C-o" 'undefined)
+(define-key fence-mode-map "\C-p" 'undefined)
+(define-key fence-mode-map "\C-q" 'undefined)
+(define-key fence-mode-map "\C-r" 'undefined)
+(define-key fence-mode-map "\C-s" 'undefined)
+(define-key fence-mode-map "\C-t" 'fence-transpose-chars)
+(define-key fence-mode-map "\C-u" 'undefined)
+(define-key fence-mode-map "\C-v" 'undefined)
+(define-key fence-mode-map "\C-w" 'henkan-fence-region)
+(define-key fence-mode-map "\C-x" 'undefined)
+(define-key fence-mode-map "\C-y" 'undefined)
+(define-key fence-mode-map "\C-z" 'eval-expression)
+(define-key fence-mode-map "\C-|" 'fence-toggle-egg-mode)
+(define-key fence-mode-map "\C-_" 'jis-code-input)
+(define-key fence-mode-map " "    'henkan-fence-region-or-single-space)
+(define-key fence-mode-map "!"	  'fence-insert-self-command)
+.....
+.....
+(define-key fence-mode-map "~"	  'fence-insert-self-command)
+(define-key fence-mode-map "\177" 'fence-backward-delete-char)
+@end example
+
+@c -------------------------------------------------------------------------
+@node henkan-mode-map, Roma kana henkan, fence-mode-map, Customization
+@section 仮名漢字変換モードの key binding の変更
+@c -------------------------------------------------------------------------
+
+仮名漢字変換モード の key binding の変更は通常の方法で行なう．仮名漢字変
+換モードの keymap には， @kbd{henkan-mode-map} を使用する．default の 
+key binding は次のようになっている．
+
+@example
+(define-key henkan-mode-map "\C-@@" 'henkan-next-kouho)
+(define-key henkan-mode-map "\C-a" 'henkan-first-bunsetu)
+(define-key henkan-mode-map "\C-b" 'henkan-backward-bunsetu)
+(define-key henkan-mode-map "\C-c" 'henkan-quit)
+(define-key henkan-mode-map "\C-d" 'undefined)
+(define-key henkan-mode-map "\C-e" 'henkan-last-bunsetu)
+(define-key henkan-mode-map "\C-f" 'henkan-forward-bunsetu)
+(define-key henkan-mode-map "\C-g" 'henkan-select-kouho)
+(define-key henkan-mode-map "\C-h" 'undefined)
+(define-key henkan-mode-map "\C-i" 'henkan-bunsetu-chijime)
+(define-key henkan-mode-map "\C-j" 'undefined)
+(define-key henkan-mode-map "\C-k" 'henkan-kakutei-before-point)
+(define-key henkan-mode-map "\C-l" 'henkan-kakutei)
+(define-key henkan-mode-map "\C-m" 'henkan-kakutei)
+(define-key henkan-mode-map "\C-n" 'henkan-next-kouho)
+(define-key henkan-mode-map "\C-o" 'henkan-bunsetu-nobasi)
+(define-key henkan-mode-map "\C-p" 'henkan-previous-kouho)
+(define-key henkan-mode-map "\C-q" 'undefined)
+(define-key henkan-mode-map "\C-r" 'undefined)
+(define-key henkan-mode-map "\C-s" 'undefined)
+(define-key henkan-mode-map "\C-t" 'undefined)
+(define-key henkan-mode-map "\C-u" 'undefined)
+(define-key henkan-mode-map "\C-v" 'undefined)
+(define-key henkan-mode-map "\C-w" 'undefined)
+(define-key henkan-mode-map "\C-x" 'undefined)
+(define-key henkan-mode-map "\C-y" 'undefined)
+(define-key henkan-mode-map "\C-z" 'undefined)
+(define-key henkan-mode-map " "    'henkan-next-kouho)
+(define-key henkan-mode-map "!"	   'henkan-kakutei-and-self-insert)
+....
+....
+(define-key henkan-mode-map "~"	   'henkan-kakutei-and-self-insert)
+(define-key henkan-mode-map "\177" 'henkan-quit)
+@end example
+
+@c -------------------------------------------------------------------------
+@node Roma kana henkan, Sun Key map, henkan-mode-map, Customization
+@section ローマ字仮名変換法の変更
+@c -------------------------------------------------------------------------
+@cindex ローマ字仮名変換法[ろーまじかなへんかんほう]
+@findex define-egg-mode mode-string
+@findex defrule
+@findex dump-egg-mode-map
+「たまご」のローマ字仮名変換方法は，@file{egg-rk.el}ファイル中で
+定義されている．この定義方法はWnnのromkanを簡単にしたものである．
+
+@defun define-egg-mode mode-string flag
+これから@code{defrule}が定義する egg-mode を宣言する．@var{mode-string}
+はこのモードの名前であり，このモードが選択された時にモードラインに表示さ
+れる文字列である．@var{flag}が@code{nil}でない場合は egg-mode の初期化を
+行なう．
+@example
+	(define-egg-mode "roma-kana" t)
+@end example
+は，egg-mode として @code{"roma-kana"} を定義することを宣言する．
+@code{t} は egg-mode @code{"roma-kana"} を clear することを指示する． 
+@code{nil} の場合は定義の追加である．
+@end defun
+
+@defun defrule input output next
+第１引数は入力文字列を，第２引数はそれに対する変換出力文字列を示す．
+@example
+	(defrule "a" "あ")
+@end example
+は，@kbd{a}を"あ"に変換することを意味する．「たまご」 では入力の大文字小
+文字を区別するので，この定義は@kbd{A}を"あ"に変換することを意味しない．
+
+第３引数がある場合には，第１引数の入力があると，第２引数を変換の出力とし，
+さらに第３引数が入力としてあったものとして変換を続ける．
+
+@example
+	(defrule  "tch" "っ" "ch")
+@end example
+は，入力 @kbd{tcha}に対して "っ" を出力した上で，@kbd{cha} の変換を行な
+う．
+
+@example
+	(defvar aa '("k" "s" "t" "h" "y" "r" "w" "g" "z" "d" "b"
+			 "p" "c" "f" "j" "v"))
+@end example
+変数は値が文字列のリストであり，文字列のセットを表す．この場合，変数 
+@code{aa} は @code{defrule} の中では @kbd{k} ... @kbd{v} のどれかを表す
+ことになる．
+@example
+	(defrule  '(aa aa) "っ" '(aa))
+@end example
+この @code{defrule} は，引数の中に現れる変数 @code{aa} を変数 @code{aa} 
+が取りうる値の文字列に一斉に置き換えて得られる文字列すべてに対して 
+@code{defrule} することを表す．@refill
+@example
+	(defrule "kk" "っ" "k")
+	(defrule "ss" "っ" "s")
+	....
+	(defrule "vv" "っ" "v")
+@end example
+と同じ．
+
+例えばローマ字仮名モードで数字を入力した時に全角数字でなく半角数字にする
+ためには，以下を行なう．まず@file{$NEAMCS/lisp/egg-rk.el}を自分用の
+@file{egg-rk.el}にコピーし，以下の部分をコメントアウトする．@refill
+@example
+	(defrule   "1"   "１")
+	(defrule   "2"   "２")
+	(defrule   "3"   "３")
+	(defrule   "4"   "４")
+	(defrule   "5"   "５")
+	(defrule   "6"   "６")
+	(defrule   "7"   "７")
+	(defrule   "8"   "８")
+	(defrule   "9"   "９")
+	(defrule   "0"   "０")
+@end example
+そのbufferで@kbd{M-x eval-current-buffer}を実行し，mode-map を修正する．
+@end defun
+
+@deffn Command dump-egg-mode-map mode-string dump-file-name
+mode-map をファイルに退避する．minibuffer で プロンプト @code{EGG
+Mode:}@:に対して@kbd{roma-kana}を指定する．（@key{SPC}を入力すると
+comletionします．）プロンプト@code{Output file name:}@: に対しては
+@file{egg-romkana-dump.el}を指定する．この操作でsource file
+@file{egg-romkana-dump.el}とそれを byte compile した object file
+@file{egg-romkana-dump.elc} ができる．@refill
+ 
+（注意）勿論直接egg-romkanaをkanji-loadしても良いが，loadに時間が掛かる．
+egg-romkana-dumpは高速にloadできる．
+@end deffn
+
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@node Sun Key map, 品詞, Customization, Top
+@appendix  X11におけるキー割り当て
+@c %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sun上でX11を使用する場合，@file{$NEMACS/lisp/egg-keymap.el}をロードする
+ことにより（例えば，@file{.emacs}の中で @code{(load "egg-keymap")}を実行
+すると）Sunのファンクション・キーが使用できる．キー割り当ては以下のとお
+り．
+
+@table @asis
+@item F1
+ファイルI/Oモード変更(@code{change-fileio-code})．F1を押す毎 に，JIS ->
+EUC -> Shift-JIS -> EUC ->..... と変化する
+@item F2
+辞書項目編集(@code{edit-dict-item})
+@item F3
+JISコード入力(@code{jis-cide-input})
+@item F4
+辞書登録(@code{toroku-region})
+@item F5
+リージョン中の半角を全角に変える(@code{zenkaku-region})
+@item F6
+リージョン中の全角を半角に変える(@code{hankaku-region})
+@item F7
+リージョン中のひらがなをカタカナに変える(@code{katakana-region})
+@item F8
+リージョン中のカタカナをひらがなに変える(@code{hiragana-region})
+@item F9
+リージョンの仮名漢字変換(@code{henkan-region})
+@item L1
+bufferの内容を現在アクティブなbufferに挿入する(@code{insert-buffer})
+@item L2
+ファイルの内容を現在アクティブなbufferに挿入する(@code{insert-file})
+@item L3
+リージョンを評価する(@code{eval-region})
+@item L4
+現在アクティブなbufferを評価する(@code{eval-current-buffer})	
+@item L5
+ウインドウの大きさを大きくする(@code{enlarge-window})
+@item L6
+ウインドウの大きさを小さくする(@code{shrink-window})
+@item L7
+現在アクティブなbufferのテキストの変更を取り消す(@code{revert-buffer})
+@item L8
+現在アクティブなbufferのテキストの変更を取り消す(@code{revert-buffer})
+@item L9
+現在アクティブなbufferの先頭にカーソルをもっていく(@code{beggining-of-buffer})
+@item L10
+現在アクティブなbufferの最後にカーソルをもっていく(@code{end-of-buffer})
+@end table
+
+@node     品詞, 概念索引 , Sun Key map, Top
+@comment  node-name,  next,  previous,  up
+@appendix 品詞の扱いについて
+
+辞書登録における品詞の扱いについて，pubdicマネジャである橘さんがpubdic参
+加者に宛てたe-mailの一部を以下に転載します．参考にして下さい．
+
+@table @asis
+@item 名詞
+これは言うまでもないと思います．ただし，固有名詞，
+"する" が付くと動詞になるものには使わないで下さい．
+@item 名詞(する)
+"検討" のように名詞だが，"する" を付けると
+動詞になるものに使います．
+@item 動詞
+@table @asis
+@item 五段
+"書か/ない", "書き/ます", "書く", "書け/ば", "書こ/う"
+のように五段活用するものに使います．登録する時は
+"書" を "か" だけで登録します．
+@item 一段(体)
+使わないで下さい．
+@item 一段(非体)
+"落ち/ない", "落ち/ます", "落ちる", "落ちれ/ば",
+"落ちろ" のような一段活用動詞の変化しない部分
+"落ち" を登録します．
+@item サ変(する)
+"達し/ない", "達し/ます", "達する", "達すれ/ば",
+"達せよ" のようなサ行変格活用する動詞に使います．
+"達" を "たっ" で登録します．語幹が名詞であるものは
+名詞(する) を使って下さい．
+@item サ変(ずる)
+基本的に上と同じですが，"論ずる" のようにザ行で
+活用するものに使います．
+@item その他
+pd-wnn と関係しますが，使う必要はないと思います．
+@end table
+@item 形容動詞
+@table @asis
+@item ダナ型
+"簡単な", "簡単だ" のような普通の形容動詞の語幹
+"簡単" を登録します．名詞とだぶるものも多いですが，
+そういう場合は両方に登録します．
+@item トタル型
+"毅然と/した", "毅然たる" のような文語的形容動詞
+に使います．
+@end table
+@item 形容詞
+"美しかっ/た", "美しく/ない", "美しい", "美しけれ/ば"
+のような形容詞の語幹 "美し" を登録します．
+@item 連体詞
+"この" (とっさに他の例が思い浮かばない)のように体言に
+かかる活用しない語を登録します．
+@item 副詞
+"だんだん", "せめて" のように用言に掛かる活用しない語を
+登録します．
+@item 接続詞
+@itemx 感動詞
+"しかし", "やはり", "へえ", "ふーん" などです．
+@item 単漢字
+一つの漢字から構成される語でも，ちゃんと名詞とか接尾語とか
+使うように．
+@item 接頭語
+"助"(監督,教授など), "大"(宣伝,改革など), "ウルトラ" など
+@item 接尾語
+"者"(担当,賛成など), "区"(品川,新宿など), "マン" など
+@item 助数詞
+接尾語と似ているが，"円", "年" など数字の後に付くもの
+@item 数詞
+現在使用していません．
+@end table
+
+@node 概念索引, 関数・変数索引 ,品詞 , Top
+@unnumbered 概念索引
+
+@printindex cp
+
+@node 関数・変数索引, , 概念索引 , Top
+@unnumbered 関数・変数索引
+
+@printindex fn
+
+@contents
+@bye

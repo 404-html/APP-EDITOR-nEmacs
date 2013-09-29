@@ -1,0 +1,63 @@
+======================================================================
+Nemacs Ver.3.3.2 (FUJIMUSUME version) の前バージョンからの主な変更点。
+						1990.5.28 by K.Handa
+
+1. Libraries
+	・新たに SKK (Ver.3.47) を配布。
+	・misc 内の関数の変更
+
+2. Bug fix
+	・bytecode.c -- Emacs 18.55 の GC 関連のバグ
+	・indent.c -- kanji-flag off 時の処理をオリジナルと同じに
+	・regex.c -- [aあ] などの re-search を正しく
+	・syntax.c -- sexp の indentation 用の処理
+	・x11term.c -- attribute 関連の処理
+	・xdisp.c -- 水平スクロール時の左端の処理
+
+3. Document
+	・たまごのドキュメントが大幅に改定
+
+======================================================================
+Nemacs Ver.3.3.1 (HINAMATSURI version) の前バージョンからの主な変更点。
+						1990.3.3 by K.Handa
+
+1. Configuration
+
+    新たに src/nconfig.h, src/puresize.h, lisp/nemacs-init.el を作成
+
+	nconfig.h -- 従来 config.h で行なっていた EGG 関連の設定
+	puresize.h -- PURESIZE の #define。
+	nemacs-init.el -- 従来 site-init.el で行なっていた種々の設定
+
+2. Renamed files (１４文字以内に）
+
+    lisp/egg-sun-keymap.el --> lisp/egg-keymap
+    lisp/wnnfns-support.el --> lisp/wnnfns.el
+    lisp/egg-roma-kana.el  --> lisp/egg-rk.el
+    lisp/egg-roma-kana-dump.el --> lisp/egg-rkdump.el
+
+3. Libraries
+
+    従来の SKK, attribute に加え、
+    ・mailnews -- mail, news の機能拡張
+    ・jxw1.10 -- 擬一太郎
+    ・misc
+    を配布。
+
+4. Bug fix
+
+    ・ポインタが日本語コードの２バイトめを指した時の処理の統一
+    ・load-file フェイル時のファイルのクローズ
+    ・kanji-flag が nil 時の re-search の無限ループ回避
+    ・画面右下に日本語を表示する際の処理
+    ・invoke-find-kanji-xxxx 起動時の GCPRO
+    ・attribute に関する画面表示時のバグフィックス
+    ・日本語に関する Overwrite Mode 
+
+    その他、大小様々のバグのフィックス。ご協力頂いた皆さん、本当にあり
+    がとうございました。
+
+5. EGG
+
+    今回戸村氏多忙のため EGG 関連の修正はあまり含まれていません。バグ
+    レポート、パッチなどを送って頂いた方々、申し訳ありません。

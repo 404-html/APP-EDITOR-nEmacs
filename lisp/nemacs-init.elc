@@ -1,0 +1,77 @@
+
+(defvar esc-dol-map (make-keymap))
+
+(defvar esc-par-map (make-keymap))
+
+(define-key esc-map "$" esc-dol-map)
+
+(define-key esc-map "(" esc-par-map)
+
+(define-key esc-dol-map "@" (quote kanji-jis-start))
+
+(define-key esc-dol-map "B" (quote kanji-jis-start))
+
+(define-key esc-par-map "B" (quote kanji-jis-end))
+
+(define-key esc-par-map "H" (quote kanji-jis-end))
+
+(define-key esc-par-map "J" (quote kanji-jis-end))
+
+(define-key esc-map "#" (quote spell-word))
+
+(define-key esc-map "{" (quote insert-parentheses))
+
+(setq-default kanji-flag t)
+
+(setq-default kanji-fileio-code 2)
+
+(setq default-kanji-process-code 2)
+
+(setq kanji-display-code 2)
+
+(setq kanji-input-code 2)
+
+(setq to-kanji-display 66)
+
+(setq to-ascii-display 66)
+
+(setq to-kanji-fileio 66)
+
+(setq to-ascii-fileio 66)
+
+(setq to-kanji-process 66)
+
+(setq to-ascii-process 66)
+
+(load-library "kanji-util")
+
+(define-program-kanji-code nil ".*mail.*" 2)
+
+(define-program-kanji-code nil ".*inews.*" 2)
+
+(define-service-kanji-code "wnn" nil 0)
+
+(define-service-kanji-code "sj3" nil 0)
+
+(define-service-kanji-code "nntp" nil 0)
+
+(garbage-collect)
+
+(autoload (quote gnus) "gnus" "\
+Read network news." t)
+
+(garbage-collect)
+
+(setq gnus-nntp-service 119)
+
+(setq gnus-nntp-server "ntttsd")
+
+(setq gnus-your-domain "ntttsd.ntt.jp" gnus-your-organization "NTT Transmission Systems Laboratories, Yokosuka, JAPAN" gnus-use-generic-from t)
+
+(garbage-collect)
+
+(if (boundp (quote EGG)) (progn (if (boundp (quote SJ3)) (progn (load-library "sj3-client") (load-library "sj3-egg") (load-library "egg-rkdump") (setq egg-default-startup-file "eggrc-sj3")) (if (not (or (boundp (quote WNN3)) (boundp (quote WNN4V3)))) (progn (load-library "wnn-client"))) (load-library "wnn-egg") (load-library "egg-rkdump") (if (or (boundp (quote WNN3)) (boundp (quote WNN4V3))) (load-library "wnnfns")) (if (boundp (quote WNN4V3)) (setq egg-default-startup-file "eggrc-v4") (setq egg-default-startup-file "eggrc-v3"))) (garbage-collect)))
+
+(setq news-inews-program "/usr/lib/news/inews")
+
+(setq initial-major-mode (quote nemacs-lisp-interaction-mode))

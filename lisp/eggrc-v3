@@ -1,0 +1,37 @@
+;;;
+;;;	 Standard Start Up File for EGG
+;;;	 Version 1.0
+;;;      Copyright 1988 Satoru.Tomura@etl.go.jp
+;;;
+
+(set-default-sys-dic-directory "/usr/local/lib/dic/sys/")
+(set-default-usr-dic-directory "/usr/local/lib/dic/usr/$USER/")
+
+;;;
+;;;  System Dictionary
+;;;
+
+(setsysdic "pd-kihon"  "pd-kihon" 5)
+
+(setsysdic "pd-setsuji" "pd-setsuji" 6)
+
+(setsysdic "pd-jinmei" "pd-jinmei" 1)
+
+(setsysdic "pd-chimei" "pd-chimei" 1)
+
+(setsysdic "pd-koyuu" "pd-koyuu" 1)
+
+(setsysdic "pd-computer"  "pd-computer" 10)
+
+(setsysdic "pd-symbol" "pd-symbol" 1)
+
+(setsysdic "pd-tankan" "pd-tankan" 0)
+
+(setsysdic "pd-wnn" "pd-wnn" 5)
+
+;;;
+;;; Private Dictionary
+;;;
+
+(setusrdic "my-dict" 5)
+

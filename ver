@@ -1,0 +1,3 @@
+pushd lisp
+cp version.el.0 version.el
+popd

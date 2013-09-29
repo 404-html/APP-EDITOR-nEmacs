@@ -1,0 +1,172 @@
+
+Nemacs 3.2 + Egg 2.1 の主な変更点は次の通りです。
+
+★ Nemacs 3.2.1
+
+１。日本語コードを含む emacs lisp の source file が load ができる。
+
+従来は .el が日本語コードを含む場合は、コードを EUC にするか 
+byte-compile して .elc にしてから load する必要があった。Nemacs 3.2 か
+らは .elc でないファイルを load する時にはまずバッファに読み込みコード
+変換をしてから load を行なう。従ってどの日本語コードで書かれたファイル
+でも load できる。
+
+２。日本語テキストに対する疑似文節の定義が変更になった。
+
+従来から M-F, M-B によって拡張 word （疑似文節）単位の操作ができたが、
+「ー」などの記号を疑似文節の切れ目としていた。Nemacs 3.2 では疑似文節
+の定義を変更し、より文節に近いものとした。
+
+この変更に関連し、 関数char-wordcode を廃止し、新たに 関数
+char-category を新設した。
+
+詳しくは info してくさだい。
+
+３。regular expression での日本語文字の扱いが変更になった。
+
+従来は regular expression での日本語文字は 8bit 目の立った２バイト文字
+列として扱っていた。この方法ではバッファ内部での文字コードの表現に 
+regular expression が依存する。将来 内部文字コードを変更する予定なので
+その準備として regular expression での日本語文字の扱いを変更した。方針
+は日本語文字を２バイトの文字列ではなく、１つの文字として扱う。
+
+例えば "." は従来は日本語文字の１バイト目にも２バイト目にも合致してい
+たが、Nemacs 3.2 では１文字（１バイト文字でも２バイト文字でも）に合致
+することとした。
+
+また従来は文字集合 "[あい]" を表現するには "\\(あ\\|い\\)" と表現する
+必要があった。"[あい]"は"[\242\244]"と同じに解釈していた。Nemacs 3.2 
+はで"[あい]"と表現できる。
+
+ほかに従来は "\242" は１バイト目が \242 である日本語文字に合致していた。
+"[\242-\243]."といった表現も認められた。Nemacs 3.2 ではこれらは \242,
+\243 が文字ではないので認められない。
+
+詳しくは info してください。
+
+４。ファイル入出力をおこなう時の漢字コードの決定方法が変更になった。
+
+従来は変数 kanji-expected-code などの値によってファイル入出力の漢字コー
+ドの決定方法が固定されていた。 Nemacs 3.2 では ファイル入力を行なう時
+には 変数 find-kanji-file-input-code の値の関数を呼びだし、またファイ
+ル出力を行なう時には変数 find-kanji-file-output-code の値の関数を呼び
+出して、漢字コードを決定する。従って利用者が自由に決定方法を変更するこ
+とができる。標準のものとしては 従来と同じものが kanji-util.el で定義さ
+れている。
+
+５。プロセス漢字コードを決定する方法もフック方式に変更になった。
+
+プロセス漢字コードを決定する方法は、従来は 関数 
+find-kanji-process-code を呼び出していたが、Nemacs 3.2 では 変数 
+find-kanji-process-code の値の変数を呼び出すことに変更した。標準設定は
+従来通り。
+
+６。kanji-flag, kanji-fileio-flag の default-value を set-default でき
+るように変更した。
+
+７。バッファの任意の領域に下線、反転のアトリビュートを付ける
+ことができるようになった。アトリビュートはマーカで記憶される
+ため、その領域内での挿入削除により領域は伸び縮みする。
+
+８。marker に point-type という新しいタイプを導入。このタイプのマーカ
+の位置への挿入は，そのマーカを挿入されたストリングの直後に移動します。
+マーカのこの動きがポイントに似ているので point-type と呼ぶ。
+
+詳しくは info してください。
+
+
+★ たまご 2.1
+
+１。たまごが Wnn V4 でも使用できるようになった。
+
+Nemacs 3.2 で たまご 2.1 を使用するには３つの方法があります。
+
+（あ）config.h で #define EGG, #define WNN3 を指定する： wnnfns.c を
+kernel に組み込み , wnn-egg.elc と wnnfns-support.elc をこの順番 で
+loadする。Wnn3 を使用できる。
+
+（い）config.h で#define EGG, #define WNN4V3 を指定する：wnnfns.c をkernel 
+に組み込み、wnn-egg.elc と wnnfns-support.elc をこの順番で load する。
+Wnn4 を V3 compatible library を経由して使用できる。
+
+（う）config.h で#define EGG だけを指定する： kernel は変更しない。 
+wnn-client.elc と wnn-egg.elc を load する。 Wnn3 が使用できる。
+
+EGG, WNN3, WNN4V3 と適当に config.h で定義すると site-init.el の中で自
+動的に preload が行なわれる。また wnn3 を使用する時は 
+egg-default-startup-file を "eggrc-v3" に、wnn4を使用する時は 
+"eggrc-v4"に設定する。
+
+（え） site で たまごが組み込まれていない場合でも利用者が 
+wnn-client.elc, wnn-egg.elc を load することで Wnn3 が使用できます。
+
+［注意１］Wnn4を使う場合は Wnn4.0.2 以降を使用して下さい。また 
+Wnn4.0.2 の V3 compatible libraray には次の２つの虫が知られています。
+
+（虫１） M-x disconnect-wnn で jserver との connetion を一旦切り、再接
+続すると Nemacs が core を吐く。
+（虫２） 辞書登録が正しく動作しないことがある。
+
+これらに対する patch は Nemacs 3.2 + Egg 2.1 には含まれていません。
+
+［注意２］wnn-client を利用する場合、jserver と Nemacs とがことなる 
+machine type, OS で動作していると接続がうまくいかない場合があります。
+sun3 - sun3, sun4 - sun4 ではこうしたことは起こりません。原因は不明で
+す。
+
+２。 key binding を含めて一部仕様が変更になった。
+
+「たまご」第２版の変更点：
+
+（あ）起動時の変更
+
+      初期化ファイル（従来は ~/.eggrc に固定だった。）を次の変数で指定できる。
+
+	egg-startup-file 	: ファイル名を指定する。
+
+	egg-startup-file-search-path: 探索パスのリストを指定する。
+
+	egg-default-startup-file: egg-startup-file* に指定されたファイ
+ルが見つからない時に読み込むファイルを指定する。
+
+
+      set-default-usr-dic-directory はdirectoryがない場合に作る。
+
+      wnn server host が特に指定されていない場合は local host を使用す
+る。
+
+
+（い）特殊記号の入力機能を提供した。(special-symbol-input)
+	C-^	メニュー方式で特殊記号を入力する。
+
+（う）漢字変換モードのマップを一部変更した。
+	M-i 文節の変換情報を表示する。(henkan-inspect-bunsetu)
+	M-s 文節の変換候補一覧をミニバッファ表示し、選択する(henkan-select-kouho)
+	C-g 漢字変換モードを中止する。
+
+     漢字変換モードに次の機能を追加した。
+	C-h  漢字変換モードコマンドを表示する。
+	M-h  文節をひらがなにする。(henkan-hiragana)
+	M-k  文節をカタカナにする。(henkan-katakana)
+	M-<  文節の長さを最長にする。(henkan-saichou-bunsetu)
+	M->  文節の長さを最小にする。(henkan-saishou-bunsetu)
+
+     漢字変換モードに help コマンドを追加した。
+
+（え）ローマ字仮名変換モードに次の機能を追加した。
+	M-h  フェンスをひらがなにする。(fence-hiragana)
+	M-k  フェンスをカタカナにカタカナする。(fence-katakana)
+	M->  フェンスを全角にする。(fence-zenkaku)
+	M-<  フェンスを半角にする。(fence-hankaku)
+
+（お）ミニバッファの入力中に、ミニバッファのモード" m[a あ]" と形式で
+モードラインに表示する。
+
+（か）henkan-region などを実行すると実行終了後に point が mark に移動
+する。
+
+（き）フェンスモード、変換モードの表示方法を 
+set-egg-fence-mode-format, set-egg-hankan-mode-format で指定できるよう
+になった。
+例：	(set-egg-fence-mode-format "" "" 'underline)
+	(set-egg-henkan-mode-format "" "" "" 'underline 'inverse)

@@ -1,0 +1,1849 @@
+Info file: nemacs,    -*-Text-*-
+produced by texinfo-format-buffer
+from file: nemacs.texinfo
+
+
+
+
+File: nemacs  Node: Top, Prev: (dir), Up: (dir), Next: NemacsUsers
+
+* Menu:
+
+* NemacsUsers::	       ユーザーズマニュアル
+* NemacsLispers::      EmacsLispの拡張
+* (EGG)::              日本語入力ツール
+
+
+File: nemacs  Node: NemacsUsers, Up: Top, Next: 概説
+
+* Menu:
+
+* Overview: 概説.              Nemacsってどんなもの？
+* Jcode: 日本語文字コード.     Nemacsがどう日本語文字コード体系を扱うか
+* Functions: 機能.	       Nemacs特有の機能
+* Misc: その他.                Nemacsに関するさまざまな情報
+* (EGG)::                      日本語入力ツール
+* NemacsLispers::              EmacsLispの拡張
+* Commands: コマンド一覧.
+* Concepts: 概念索引.
+* Functions&Variables: 関数・変数索引.
+
+各ノードの下位ノード
+
+日本語文字コード
+* Jsystems: 日本語文字コード体系.  さらに日本語コードについて
+* Buffer: バッファ管理.            Nemacsはバッファをどう扱うか
+* Input: キーボード入力.           日本語キーボード入力
+* Display: ディスプレイ表示.       日本語の表示
+* FileI/O: ファイル入出力.         日本語を含むファイルの取り扱い
+* Process: プロセス間通信.         日本語を含むプロセス間通信
+
+機能
+* Jcodefunc: 日本語文字コードを扱う関数. 日本語文字コード体系に関する関数
+* Jtextfunc: 日本語文書編集機能. 文書編集の機能
+* Enhancemnet: 日本語処理のための拡張.
+
+その他
+* Documents: ドキュメント.  ドキュメントの在処
+* Keymaps: キーマッピング.  キーマップの変更点
+
+NemacsLispers
+* Marker: マーカの拡張.
+* Attribute: 属性の付与.
+
+GNU Emacsからの変更点（拡張点は除きます）
+* Search:  探索.             正規表現が拡張され一部変更されています
+* Keymaps: キーマッピング. ispell-wordとinsert-parentheseのキーが変更されています
+
+
+File: nemacs  Node: 概説, Prev: NemacsUsers, Up: NemacsUsers, Next: 日本語文字コード
+
+Nemacs Version 3.3
+******************
+
+Nemacs は GNU Emacsに基づく日本語エディタです．Nemacs は GNU
+Emacs/Nemacsへのパッチの形で配布されています．最新版はNemacs Ver.3.3.2
+(1990.6.6) で, Nemacs 3.3.1 へのパッチです．
+
+Nemacsの特徴は次の３つです．
+   * Nemacsは漢字かな混じり文，つまり普通の日本語の文をバッファに保持でき，ス
+     クリーンに表示できます．さらに日本語文を編集するための機能を提供します．
+   * ファイル入出力，プロセス間通信, スクリーン表示，キーボード入力のそれぞれ
+     について独立に日本語文字コード体系を設定できます．使用できるコード体系は
+     JIS, シフトJIS, EUCの３つです．
+   * 日本語モードでない場合には，オリジナルのGNU Emacsと同様に使えます．
+
+Nemacsのチュトリアルはコマンド`C-h T' (*help-with-tutorial-for-nemacs*)
+で起動できます．Nemacsのバージョンは*nemacs-version*で，最近の変更点は
+*view-nemacs-news*で知ることができます．
+
+コマンド：
+## Command: help-with-tutorial-for-nemacs
+     Nemacsの日本語版チュトリアルを起動する．
+## Command: view-nemacs-news
+     Nemacsの最新の変更点を表示する.
+## Command: nemacs-version
+     Nemacsのバージョンを表示する．
+
+
+File: nemacs  Node: 日本語文字コード, Prev: 概説, Up: NemacsUsers, Next: 日本語文字コード体系
+
+日本語文字コードの体系
+**********************
+
+Nemacsのバッファは，日本語モードで日本語を扱うことができます．日本語モー
+ドにするには，コマンド`C-x C-k t'（*toggle-kanji-flag*）で変数
+`kanji-flag'を `t' にします．変数`kanji-flag'のデフォールト値は変数
+`default-kanji-flag'に保持され，コマンド`C-x C-k T'
+（*toggle-default-kanji-flag*）で設定できます．
+
+Nemacs は３種類の日本語文字コード体系を取り扱うことができます．使用でき
+る日本語文字コード体系はJIS, シフトJIS, EUCです．日本語文字コード体系の
+ことを漢字コード，あるいは単にコードと呼ぶことがあります．Nemacsは，日本
+語文書の内部表現（バッファ漢字コード）としてEUCコードを使っています．
+
+定義:
+*バッファ漢字コード*
+     Nemacsがバッファの内部表現として用いるコード体系（EUC）
+*ファイル漢字コード*
+     文書ファイルで用いられているコード体系
+*プロセス漢字コード*
+     Nemacsと外部プロセスの通信に用いられるコード体系
+*ディスプレイ漢字コード*
+     Nemacsが端末表示用に送信するコード体系
+*キーボード漢字コード*
+     Nemacsがキーボード入力として予期しているコード体系
+
+変数:
+## Local Variable: kanji-flag
+     nil
+          日本文字コードへの変換や日本語表示を行なわない．GNU Emacsと同じ.
+     t
+          日本語文字コードへの変換，日本語表示を行なう．
+## Global Variable: default-kanji-flag
+     kanji-flagのデフォールト値．
+
+コマンド:
+## Command: toggle-kanji-flag
+     `kanji-flag'の値を，`t'から`nil'，`nil'から`t'に切替
+     える．
+## Command: toggle-default-kanji-flag
+     `default-kanji-flag'の値を，`t'から`nil'，`nil'から
+     `t'に切替える．
+
+* Menu:
+
+* Jsystems: 日本語文字コード体系.  さらに日本語コードについて
+* Buffer: バッファ管理.            Nemacsはバッファをどう扱うか
+* Input: キーボード入力.	   日本語キーボード入力
+* Display: ディスプレイ表示.       日本語の表示
+* FileI/O: ファイル入出力.	   日本語を含むファイルの取り扱い
+* Process: プロセス間通信.	   日本語を含むプロセス間通信
+
+
+File: nemacs  Node: 日本語文字コード体系, Prev: 日本語文字コード, Up: 日本語文字コード, Next: バッファ管理
+
+日本語文字コード体系
+====================
+
+通信用日本語文字コードはJIS (日本工業規格）6226で定められていますが，現
+在以下の３種類のコード体系が共存して使用されています．
+
+   * 7bit JIS コード
+   * 8bit シフトJIS コード
+   * 8bit EUC コード
+
+JISコードは７ビットであり，ネットワーク経由の通信プロセス（電子メイルな
+ど）は８ビットを通さないことが多いため，ネットワーク経由で他の計算機と通
+信を行なうようなプログラムに多用されています．また，計算機と日本語端末間
+のシリアルライン通信にも広く用いられています．
+
+シフトJISコードとEUCコードは，日本語をサポートするOSのほとんどにおいて，
+文書ファイルのコードやアプリケーションプログラムの内部表現として使われて
+います．
+
+つまり，JISコードの電子メイルを受け取り，それをファイルにしまうためにシ
+フトJISに変換し，さらに端末に表示するためにまたJISコードに戻すといった操
+作が日常的に行なわれるわけです．このような現実に対応するため，Nemacsでは
+次の４種類の処理に対して独立のコードを設定できるようになっています．
+
+   * ファイル入出力
+   * プロセス間通信
+   * ディスプレイ表示
+   * キーボード入力
+
+これらの処理にそれぞれどのコードが設定されているかは，`C-x C-k C'
+(*list-kanji-code*)または`C-x C-k c' (*list-kanji-code-briefly*)で知るこ
+とができます．
+
+コマンド:
+## Command: list-kanji-code
+     `*Kanji Codes*'というバッファを作り，そこに日本語文字コード体系に関する変
+     数を表示する．
+## Command: list-kanji-code-briefly
+     ミニバッファに日本語文字コード体系に関する変数を表示する．
+
+
+File: nemacs  Node: バッファ管理, Prev: 日本語文字コード体系, Up: 日本語文字コード, Next: バッファ生成
+
+Nemacsのバッファ
+================
+Nemacsのバッファには，２バイトの日本語文字とASCIIのような１バイト文字が
+共存できます．日本語文字とはEUC，JIS，シフトJISのいずれかのコード体系に
+含まれている文字を指します．１バイト文字をalphanumericsと呼びます．（注
+意：２バイト日本語文字中の英数字とalphanumericsは別のものです．）
+
+* Menu:
+
+* Internal:	 内部表現.  Nemacsのバッファはどう表現されるか
+* BufferGen: 	バッファ生成. バッファ生成時に何をするか
+
+
+File: nemacs  Node: 内部表現, Prev: バッファ管理, Up: バッファ管理, Next: バッファ生成
+
+日本語文字の内部表現
+--------------------
+
+Nemacsのバッファは８ビット文字のアレイとして表現されます．alphanumericは
+８ビットで表され，日本語文字のコードは２つの連続する８ビットを用いて表さ
+れています．
+
+alphanumeric の内部表現は`0XXXXXXX'（alphanumeric１文字は７ビットで
+表現できる），日本語文字の内部表現は`1XXXXXXX 1XXXXXXX'です．
+
+
+File: nemacs  Node: バッファ生成, Prev: 内部表現, Up: バッファ管理, Next: キーボード入力
+
+バッファ生成
+------------
+
+  新規バッファ生成時には，Nemacsはバッファの変数`kanji-flag'に変数
+`default-kanji-flag'の値を設定します.
+
+
+変数`kanji-flag'が `t'の時，つまりコード変換を行ない日本語を表示する時に
+は, モードラインの右端に以下のような漢字コードニーモニックが現れます．
+
+     --**-NEmacs: Nemacs.text (Text)--Top-- [-JJN]---
+                                             ^^^^
+
+表示されるコードは左から順に
+kanji-fileio-code
+     ファイル入出力に用いられるコード（*Note ファイル入出力::）
+kanji-input-code
+     キーボード入力として予期しているコード（*Note キーボード入力::）
+kanji-display-code
+     端末表示に用いているコード（*Note ディスプレイ表示::）
+process-kanji-code
+     バッファプロセスとの通信に用いているコード（*Note プロセス間通信::）
+です．
+
+またニーモニックはそれぞれ
+-
+     未設定
+N
+     無変換
+J
+     JISコード
+S
+     シフトJISコード
+E
+     EUCコード
+を表します．
+
+変数:
+## Local Variable: kanji-flag
+     nil
+          漢字コードへの変換や日本語表示を行なわない．GNU Emacsと同じ.
+     t
+          漢字コードへの変換，日本語表示を行なう．
+## Global Variable: default-kanji-flag
+     kanji-flagのデフォールト値.
+
+
+File: nemacs  Node: キーボード入力, Prev: バッファ管理, Up: 日本語文字コード, Next: ディスプレイ表示
+
+キーボード入力
+==============
+
+キーボードから日本語を入力するには，３種類の日本語文字コードのうち一つを
+使います．どのコードを使いたいかはあらかじめNemacsに教えてやる必要があり
+ます．これはコマンド*set-kanji-input-code*を呼ぶことによって行な
+えます．`C-x C-k i'（コマンド*change-input-code*）を使うこと
+もできます．
+
+
+選択したコードは`kanji-input-code'の値として保持され，Nemacsは入力をその
+コードだと思って受け取り，内部コード（EUC）に変換します．１つの日本語文
+字は２バイトで表現されるので，Nemacsは日本語コードの最初の１バイトを次の
+バイトが来るまで取っておき，２バイト揃ったところで内部コードに変換してバッ
+ファに挿入します．
+
+JISコードを使う時には，２種類のエスケープシークエンス（通常` ESC $
+@ 'と ` ESC ( J 'を使います）によって，日本語文字とalphanumericの切替
+えを行ないます.  これらのエスケープシークエンスはそれぞれコマンド
+*kanji-jis-start*と *kanji-jis-end*を起動するキーシークエンスです．
+
+コマンド*jis-code-input*を呼ぶと，16進表現のJISコードによる入力ができ
+ます．ミニバッファにコードを入力して`RET'キーを押して下さい．ポイン
+トの位置に対応する文字が挿入されます．
+
+変数:
+## Global Variable: kanji-input-code
+     Nemacsがキーボード入力として予期しているコード体系
+     0
+          無変換
+     1
+          シフトJISコード
+     2
+          JISコード
+     3
+          EUCコード
+
+コマンド:
+## Command: set-kanji-input-code CODE
+     kanji-input-codeをCODEに設定する．CODEは，
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+## Command: kanji-jis-start
+     フラグ`kanji-JIS-flag'を`t'にする．
+## Command: kanji-jis-end
+     フラグ`kanji-JIS-flag'を`nil'にする．
+## Command: change-input-code
+     `kanji-input-code'の値を次の順序で切替える． NIL（未設定）→0（無
+     変換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+## Command: jis-code-input
+     jisコードによる直接入力．
+
+
+File: nemacs  Node: ディスプレイ表示, Prev: キーボード入力, Up: 日本語文字コード, Next: ファイル入出力
+
+ディスプレイへの表示
+====================
+
+Nemacsは，変数`kanji-display-code'の値で指定されたコードに日本語文字を変
+換してディスプレイに送ります．変数`kanji-display-code'はコマンド
+*set-kanji-display-code*を呼ぶことで設定できます．`C-x C-k d'
+(*change-display-code*)を使うこともできます．
+
+Nemacsは日本語文字のフォントとしてalphanumericのフォントと同じ高さで２倍
+の幅を持つものを使います．つまり，２バイトコードは１バイトコードのちょう
+ど２倍の幅を持つわけです．
+
+変数:
+## Global Variable: kanji-display-code
+     Nemacsが端末表示用に送信するコード体系
+     0
+          無変換
+     1
+          シフトJISコード
+     2
+          JISコード
+     3
+          EUCコード
+## Global Variable: to-ascii-display
+     （JISコードが選択されている場合のみ有効）ディスプレイにASCII文字を送るよ
+     うに切替えるエスケープシークエンスの最後の文字．
+## Global Variable: to-kanji-display
+     （JISコードが選択されている場合のみ有効）ディスプレイに日本語文字を送る
+     ように切替えるエスケープシークエンスの最後の文字．
+
+コマンド:
+## Command: set-kanji-display-code CODE
+     `kanji-display-code'をCODEに設定する.
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+## Command: change-display-code
+     `kanji-display-code'の値を次の順序で切替える． NIL（未設定）→0
+     （無変換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+## Command: x-set-kfont
+     X windowで使用する日本語文字フォントを設定する．
+
+
+File: nemacs  Node: ファイル入出力, Prev: ディスプレイ表示, Up: 日本語文字コード, Next: プロセス間通信
+
+ファイルの読み書き
+==================
+
+Nemacsの各バッファは２つの変数`kanji-flag'と`kanji-fileio-code'を持ちま
+す.  １つめの`kanji-flag'はそのバッファが日本語文字を含むかどうかを示し
+ます．つまり`kanji-flag'がnilならば， Nemacsは日本語文字があらわれないと
+思い，基本的にGNU Emacsと同じように振舞います.この場合にはNemacsを用いて
+８ビットデータの編集ができます．
+
+２つめの変数`kanji-fileio-code'は， Nemacsがファイルの読み書きに使う日本
+語文字コード体系を示します．この変数は関数*set-kanji-fileio-code*や
+*change-fileio-code*(`C-x C-k f')によって設定できます．デフォルト値は
+`default-kanji-fileio-code'に保持され，関数
+`set-default-fileio-code',`change-default-fileio-code'(`C-x C-k F')によっ
+て変更可能です．
+
+Nemacsはファイルを読む時にはファイルが`kanji-fileio-code'によって指定さ
+れるコードで書かれているものとして読み込み，またファイルに文書を書き出す
+前には文書を`kanji-fileio-code'で指定されるコードに変換します．
+
+変数:
+## Local Variable: kanji-flag
+     nil
+          漢字コードへの変換や日本語表示を行なわない．GNU Emacsと同じ.
+     t
+          漢字コードへの変換，日本語表示を行なう．
+## Local Variable: kanji-fileio-code
+     ファイル入出力に用いられるソース／ターゲット漢字コード．ファイル入力時に
+     は，`kanji-expected-code'がnilの場合にのみ使用される．
+     nil
+          未設定
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+## Global Variable: default-kanji-fileio-code
+     バッファの変数`kanji-fileio-code'のデフォールト値
+     	nil
+          未設定
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+## Global Variable: to-ascii-fileio
+     ASCII文字を選択するエスケープシーケンスの最後の文字（JISコードが選
+     ばれている時のみ有効）
+## Global Variable: to-kanji-fileio
+     日本語文字を選択するエスケープシーケンスの最後の文字（JISコードが選
+     ばれている時のみ有効）
+
+コマンド:
+## Command: set-kanji-fileio-code CODE
+     `kanji-fileio-code'の値をCODEに設定する．CODEは以下のいずれか．
+     	nil
+          未設定
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+## Command: change-fileio-code
+     `kanji-fileio-code'の値を次の順序で切替える．NIL（未設定）→0（無変
+     換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+## Command: set-default-fileio-code CODE
+     `default-kanji-fileio-code'の値をCODEに設定する．CODEは以下のいずれ
+     か．
+     	nil
+          未設定
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+## Command: change-default-fileio-code
+     `default-kanji-fileio-code'の値を次の順序で切替える． NIL（未設定）
+     →0（無変換）→1（シフトJISコード）→2（JISコード）→3（EUCコード）→NIL
+
+* Menu:
+
+* FileInput:	 ファイル入力.  入力時にコード体系をどう決めるか.
+* FileOutput:   ファイル出力. 出力時に何をするか.
+
+
+File: nemacs  Node: ファイル入力, Prev: ファイル入出力, Up: ファイル入出力, Next: ファイル出力
+
+ファイル入力
+------------
+
+バッファの変数`kanji-flag'の値がtの時は，Nemacsはそのバッファに読み込ま
+れるファイルは漢字コードを含むことを期待します．Nemacsは３種類の漢字コー
+ドを知っているので，入力されるファイルが３つのうちのどのコードで書かれて
+いるかを調べなければなりません．入力ファイルが書かれているコードをそのファ
+イルの*ファイル漢字コード*と呼びます．
+
+Nemacsは変数`kanji-expected-code'と変数 `kanji-fileio-code'にしたがって*
+ファイル漢字コード*を決定します．これらの変数は関数
+*set-kanji-expected-code*と関数*set-kanji-fileio-code*によって設定するこ
+とができます．
+
+*ファイル漢字コード*は次のようにして決められます．
+
+変数`kanji-expected-code'が `nil' でも`t' でもなければ，その値が*ファイ
+ル漢字コード*として使われます．
+
+変数`kanji-expected-code'が `nil' でかつ変数`kanji-fileio-code'が `nil' 
+以外ならば，`kanji-fileio-code'の値が*ファイル漢字コード*となります．
+
+変数`kanji-expected-code'が `t'，あるいは`kanji-expected-code'と 
+`kanji-fileio-code' が両方とも `nil' ならば，Nemacsはファイルを調べ，使
+われているコード体系を推測し，それを*ファイル漢字コード*とします．
+
+この際`kanji-expected-code'が`nil'ならば，推測したコードを
+`kanji-fileio-code'に設定します．変数`kanji-fileio-code'の値として可能な
+日本語文字コード体系の意味は以下の通りです． 
+nil
+     無設定
+0
+     バッファ漢字コードと同じ（無変換）
+1
+     シフトJIS
+2
+     JIS
+3
+     EUC
+
+* Menu:
+
+* File-insertion: ファイルの挿入. 既存バッファに挿入する場合のコード
+* Read-in: 漢字ファイルの読み込み. コード体系をを読み込み時に指定する
+* Find-new-file: 新規ファイル作成時. ファイル作成時のコード
+
+
+File: nemacs  Node: ファイルの挿入, Prev: ファイル入力, Up: ファイル入力, Next: 漢字ファイルの読み込み
+
+ファイルの挿入
+..............
+
+既存のバッファにファイルを*insert-file*などで挿入する時には，Nemacs はま
+ずそのバッファの変数`kanji-fileio-code' が `nil' 以外の有効な値であるか
+どうかを調べます．`nil'でなければ，挿入されるファイルはそのコードで書か
+れているものとしてバッファに読み込みます．変数`kanji-fileio-code'が 
+`nil' の時，つまりバッファが１バイト文字だけで構成されている時には，挿入
+されるファイルは`kanji-expected-code'で示されるコードで書かれているとし
+て読み込みを行ないます． 
+
+変数:
+## Global Variable: kanji-expected-code
+     Nemacs がファイルを読み込む時に予期する日本語文字コード体系
+     nil
+          変数 `kanji-fileio-code'の値
+     t
+          ファイルを調べてコードを推測する
+     0
+          バッファ漢字コードと同じ（無変換）
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+## Global Variable: default-kanji-fileio-code
+     バッファの変数`kanji-fileio-code'のデフォールト値
+     nil
+          未設定
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+
+コマンド:
+## Command: set-kanji-expected-code VAL
+     `kanji-expected-code' の値を VALに設定する．
+     nil
+          変数 `kanji-fileio-code'の値
+     t
+          ファイルを調べてコードを推測する
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+## Command: set-kanji-fileio-code CODE
+     kanji-fileio-code の値をCODEに設定する．
+     nil
+          未設定
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+
+
+File: nemacs  Node: 漢字ファイルの読み込み, Prev: ファイルの挿入, Up: ファイル入力, Next: 新規ファイル作成時
+
+漢字ファイルの読み込み
+......................
+
+*find-file*,*find-alternate-file*,*find-file-other-window*のいずれかを行
+なってファイルを読み込む場合に，数引数を与えることによって一時的に
+`kanji-expected-code'を指定することができます．`kanji-expected-code'を恒
+久的に変えてしまいたい場合には，関数*set-kanji-expected-code*を使って下
+さい．
+
+`C-u -   C-x C-f'
+`C-u -   C-x C-v'
+`C-u -   C-x 4 C-f'
+     `kanji-expected-code'は nil，つまり変数`kanji-fileio-code'の値．
+`C-u     C-x C-f'
+`C-u     C-x C-v'
+`C-u     C-x 4 C-f'
+     `kanji-expected-code'は t，つまりファイルを調べて推測する．
+`C-u 0   C-x C-f'
+`C-u 0   C-x C-v'
+`C-u 0   C-x 4 C-f'
+     `kanji-expected-code'は 0，つまりアスキー文字のみ．
+`C-u 1   C-x C-f'
+`C-u 1   C-x C-v'
+`C-u 1   C-x 4 C-f'
+     `kanji-expected-code'は 1，つまりシフトJIS．
+`C-u 2   C-x C-f'
+`C-u 2   C-x C-v'
+`C-u 2   C-x 4 C-f'
+     `kanji-expected-code'は 2，つまりJIS．
+`C-u 3   C-x C-f'
+`C-u 3   C-x C-v'
+`C-u 3   C-x 4 C-f'
+     `kanji-expected-code'は 3，つまりEUC．
+
+変数：
+## Global Variable: kanji-expected-code
+     Nemacs がファイルを読み込む時に予期する日本語文字コード体系
+     nil
+          変数 `kanji-fileio-code'の値
+     t
+          ファイルを調べてコードを推測する
+     0
+          アスキー，つまり無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+
+コマンド:
+## Command: set-kanji-expected-code VAL
+     `kanji-expected-code'を VAL に設定する．
+
+
+File: nemacs  Node: 新規ファイル作成時, Prev: 漢字ファイルの読み込み, Up: ファイル入力, Next: ファイル出力
+
+新規ファイル作成
+................
+
+新規に作成したファイルのファイル漢字コードのデフォールト値は，変数
+`default-kanji-fileio-code-find-file-not-found'で指定できます．この
+変数のデフォールト値は，変数`default-kanji-fileio-code'の値です．
+
+変数:
+## Local Variable: default-kanji-fileio-code-find-file-not-found
+     新規に作成されたファイルのファイル漢字コードのデフォールト値．ファイル入
+     力時には，`kanji-expected-code'がnilの場合にのみ使用される．
+     nil
+          未設定
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+
+
+File: nemacs  Node: ファイル出力, Prev: ファイル入力, Up: ファイル入出力, Next: プロセス間通信
+
+ファイル出力
+------------
+
+バッファをファイルに書き出す時には，Nemacsはバッファ中の文書を変数
+`kanji-fileio-code'に示されたコードに変換した上で，書き出しを行ない
+ます．
+
+変数:
+## Local Variable: kanji-fileio-code
+     ファイル入出力に用いられるソース／ターゲット漢字コード．ファイル入力時に
+     は，`kanji-expected-code'がnilの場合にのみ使用される．
+     nil
+          未設定
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+## Global Variable: default-kanji-fileio-code
+     バッファの変数`kanji-fileio-code'のデフォールト値
+     nil
+          未設定
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+
+
+File: nemacs  Node: プロセス間通信, Prev: ファイル入出力, Up: 日本語文字コード, Next: 機能
+
+外部プロセスとの通信
+====================
+
+Nemacs は外部プロセスやネットワーク上のサーバプロセスを起動し，それらと
+通信することができます．それぞれのプロセスは独自の*プロセス漢字コード*を
+持っています．関数 *process-kanji-code*によって各プロセスの*プロセス漢字
+コード*を知ることができます． Nemacs は指定された日本語文字コードにテキ
+ストを変換して外部プロセスやサーバプロセスと通信し，外部プロセスやサーバ
+プロセスから受け取ったテキストをNemacsの内部表現に変換します．
+
+関数*start-process*や*open-network-stream*によって外部プロセスを起動した
+り，*call-process*や *call-process-region*によって実行したりする場合には， 
+Nemacs はフック*find-kanji-process-code*を呼び，結果を*プロセス漢字コー
+ド*に設定します．関数*set-process-kanji-code*によって*プロセス漢字コード
+*を直接設定したり，関数*change-process-code* (`C-x C-k p')によって*プロ
+セス漢字コード*を変更することもできます．さらに，フック
+*find-kanji-process-code*の値を変更して Nemacsが*プロセス漢字コード*を見
+つける方法をユーザ毎に変更えたりすることもできます．（*Note プロセスにつ
+いてもっと::） 
+
+*プロセス漢字コード*のデフォルト値は`default-process-kanji-code'に保持さ
+れ，関数*change-default-process-code*(`C-x C-k P')や
+*set-default-kanji-process-code*で設定できます． 
+
+変数:
+## Hook: find-kanji-process-code BUFFER/SERVICE PROGRAM/HOST CODE
+     バッファBUFFERのプログラムPROGRAMまたはホストHOSTのサービスSERVICEの
+     *プロセス漢字コード*を返す．CODEのニーモニックは以下の通り．
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+## Global Variable: default-kanji-process-code
+     *プロセス漢字コード*のデフォールト値
+## Global Variable: to-ascii-process
+     アスキー文字を選択するためのエスケープシーケンスの最後の文字．
+     （JISコードが用いられている場合のみ有効）
+## Global Variable: to-kanji-process
+     日本語文字を選択するためのエスケープシーケンスの最後の文字．
+     （JISコードが用いられている場合のみ有効）
+
+コマンド:
+## Function: process-kanji-code &optional PROCESS
+     プロセスPROCESSの日本語文字コードを返す．引数なしで呼ばれた場合には， 現
+     在のバッファプロセスの*プロセス漢字コード*を返す．*プロセス漢字
+     コード*のニーモニックは以下の通り．
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+## Command: change-process-code
+     *プロセス漢字コード*を次の順序で切替える．
+     NIL（未設定）→0（無変換）→1（シフトJISコード）→2（JISコード）→3（EUC
+     コード）→NIL
+## Command: set-process-kanji-code PROCESS CODE
+     プロセスPROCESSの*プロセス漢字コード*をCODEに設定する．PROCESS がNIL
+     の場合には，現在のバッファプロセスの *プロセス漢字コード*を設定する．
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+## Command: change-default-process-code
+     `default-kanji-process-code'の値を次の順序で切替える．
+     NIL（未設定）→0（無変換）→1（シフトJISコード）→2（JISコード）→3（EUC
+     コード）→NIL
+## Command: set-default-kanji-process-code CODE
+     `default-kanji-process-code'の値をCODEに設定する．CODEは以下のいず
+     れか．
+     0 または 'noconv または "NOCONV"
+          無変換
+     1 または 'shift-JIS または "SHIFT-JIS"
+          シフトJISコード
+     2 または 'JIS または "JIS"
+          JISコード
+     3 または 'euc または "EUC"
+          EUCコード
+
+* Menu:
+
+* MoreProcess: プロセスについてもっと. Nemacsはどうやってプロセス漢字コードを決めるか
+
+
+File: nemacs  Node: プロセスについてもっと, Prev: プロセス間通信, Up: プロセス間通信, Next: 機能
+
+プロセスについてもっと
+----------------------
+
+`(load-library "kanji-util")'を行なうと，Nemacsが*プロセス漢字コード*を
+決める方法を変えることができるようになります．関数
+*define-program-kanji-code*は外部プロセスの*プロセス漢字コード*を宣言し，
+関数 *define-service-kanji-code*はネットワーク上のサーバの*プロセス漢字
+コード*を宣言します．これらの宣言をおこなうと，*find-kanji-process-code*
+は宣言に沿った値を返すようになります．関数*find-kanji-process-code* が適
+当な値を返さなかった場合には，Nemacsは代わりに変数 
+`default-kanji-process-code' の値を用いてプロセス通信を行ないます．
+
+関数:
+## Function: find-kanji-process-code BUFFER/SERVICE PROGRAM/HOST CODE
+     バッファBUFFERのプログラムPROGRAMまたはホストHOSTのサービスSERVICEの
+     *プロセス漢字コード*を返す．CODEのニーモニックは以下の通り．
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+## Function: define-program-kanji-code BUFFER PROGRAM CODE
+     BUFFERとPROGRAM は正規表現 か NIL． NIL は任意のストリングとマッチする．
+     CODEはシンボルか日本語文字コードニーモニック．
+     *find-kanji-process-code*がBUFFERとPROGRAMの２つの引数で呼ばれた
+     場合に，*プロセス漢字コード*を決定するCODEを定義する．CODE がシン
+     ボルならばCODE の関数定義が呼ばれ，日本語文字コードニーモニックが返る．
+
+     コードニーモニックは以下の通り．
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUCたとえば，`(define-program-kanji-code ".*shell.*" nil 2)' 
+     はバッファ名が"shell"を含む場合にはJISコードを使うように，
+     *find-kanji-process-code* を変更する．
+## Function: define-service-kanji-code SERVICE HOST CODE
+     SERVICEとHOST は正規表現かNIL.  NIL は任意のストリングとマッチする．
+     CODEはシンボルか日本語文字コードニーモニック．
+     *find-kanji-process-code*がSERVICEとHOSTの２つの引数で呼ばれた場合
+     に，*プロセス漢字コード*決定するCODEを定義する．CODE がシンボルなら
+     ばCODE の関数定義が呼ばれ，日本語文字コードニーモニックが返る． コー
+     ドニーモニックは以下の通り．
+     0
+          無変換
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+     たとえば， `(define-service-kanji-code "wnn" nil 0)'はNemacsがサー
+     ビス"wnn"を使用する場合にはコード変換を行なわないことを宣言する．
+
+
+
+File: nemacs  Node: 機能, Prev: 日本語文字コード, Up: NemacsUsers, Next: 日本語文字コードを扱う関数
+
+Nemacsの機能
+************
+
+Nemacsは日本語文書編集の様々な機能を提供します．
+
+* Menu:
+
+* Jcodefunc: 日本語文字コードを扱う関数. 日本語文字コード体系に関する関数
+* Jtextfunc: 日本語文書編集機能.         文書編集の機能
+* Enhance:   日本語処理のための拡張.
+
+
+File: nemacs  Node: 日本語文字コードを扱う関数, Prev: 機能, Up: 機能, Next: 日本語文書編集機能
+
+日本語文字コード関連の関数
+==========================
+
+Nemacsは日本語文字コード体系に関連して以下の関数を提供しています．これら
+によって，バッファ中のテキストの日本語文字コード体系を変換することなどが
+可能です．
+
+コマンド:
+## Command: convert-region-kanji-code SOURCE TARGET
+     SOURCEとTARGETは文字コードのニーモニック．
+     0
+          無変換
+     1
+          シフトJISコード
+     2
+          JISコード
+     3
+          EUCコード
+     ポイントからマークまでのテキストの日本語文字コードを，SOURCEから
+     TARGETに変換する．
+## Command: kanji-delete-region
+     ポイントからマークまでのテキストを削除する．`kanji-flag'が`t'で
+     ポイントあるいはマークが２バイト文字の間にある場合には削除されなかった１
+     バイトを１バイトの空白文字で置き換える．
+
+関数:
+## Function: convert-string-kanji-code STRING SOURCE TARGET
+     STRINGの日本語文字コードをSOURCEからTARGETに変換し，その結果を返す．
+## Function: check-region-kanji-code
+     ポイントからマークまでのテキストの，日本語文字コードニーモニックを返す．
+     ニーモニックは以下の通り．
+     nil
+          リージョンに日本語文字コードは含まれていない．
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+     NemacsがEUCとシフトJISのどちらであるか判断できなかった時には， EUC（ニー
+     モニックは３）が返る．
+## Function: check-string-kanji-code STRING
+     STRINGの日本語文字コードを返す．ニーモニックは以下の通り．
+     nil
+          STRINGに日本語文字コードは含まれていない．
+     1
+          シフトJIS
+     2
+          JIS
+     3
+          EUC
+     NemacsがEUCとシフトJISのどちらであるか判断できなかった時には， EUC（ニー
+     モニックは３）が返る．
+## Function: kanji-char-after POS
+     引数 POSは数．現在のバッファ中のposition POSにある日本語文字のEUCコード
+     をintegerで返す．文字が日本語文字でなければ，その文字のnormal codeを返す．
+     POSが領域外であれば，NILを返す．
+## Function: jcode-type POS
+     position POSの文字の文字種を返す．文字種ニーモニックは以下の通り．
+     0
+          日本語文字以外
+     1
+          日本語文字の第一バイト
+     2
+          日本語文字の第二バイト
+     nil
+          POSが領域外
+
+
+File: nemacs  Node: 日本語文書編集機能, Prev: 日本語文字コードを扱う関数, Up: 機能, Next: 日本語正書法
+
+日本語文書編集機能
+==================
+
+Nemacs は文節（*Note 日本語正書法::）単位のオペレーションや日本語テキス
+トの探索，置換を行なうことができます．日本語文書においては語単位の操作よ
+り，文節単位の操作の方が一般的であるという判断に基づいて，Nemacsでは日本
+語文字については疑似的な文節単位の操作を行なうように語の概念を拡張してい
+ます．（日本語文書以外のテキストについては，オリジナルのGNU Emacsが提供
+する語単位の操作と同等です．*Note シンタックス::）日本語には文節境界を示
+す記法はないので，Nemacsはすべての文字に対してカテゴリを定義し，これを用
+いて文節境界を推測し，疑似文節を切り出しています．
+
+* Menu:
+
+* Ontho: 日本語正書法.      日本語の書き方について
+* Syntax: シンタックス.  日本語文字のシンタックス
+* Bunsetsu: 疑似文節.    語の概念の拡張
+* Search: 探索.	日本語文書の探索と置換
+* Fill&Justify: 行詰めと行揃え.
+
+
+File: nemacs  Node: 日本語正書法, Prev: 日本語文書編集機能, Up: 日本語文書編集機能, Next: シンタックス
+
+日本語正書法
+------------
+
+日本語の文書は５種類の文字から構成されます．５種類の文字とは，ひらがな，
+かたかな，漢字，記号と英数字です．ひらがなとかたかなを総称してかなと呼び
+ます．ひらがなとかたかなは表音文字で，漢字は表意文字です．日本語には多く
+の同音意義語があり，おなじ発音とおなじかな表記を持つ漢字の語がたくさんあ
+ります．かなは，ローマ字と呼ばれるアルファベット表記がありますが，この表
+記法は普通の日本語文書にはほとんど用いられません．
+
+日本語の文は１つ以上の句からでき，句は１つ以上の*文節*からできてい
+ます．文節は概略次のようなものです．
+  1. 助詞や助動詞を除く語
+  2. 前項のものに１つ以上の助詞あるいは助動詞が続いたもの
+読点（。）が文の区切りを示し，句点（、）が句の区切りを示します．文節や語
+の区切りを示す記法はありません．
+
+
+File: nemacs  Node: シンタックス, Prev: 日本語正書法, Up: 日本語文書編集機能, Next: 疑似文節
+
+日本語文字のシンタックス
+------------------------
+
+GNU Emacsでは各バイトに対して`char-syntax'が定義できます．GNU Emacs
+の*char-syntax* を拡張して，Nemacsでは日本語文字コードの２つのバ
+イトのうちいずれかであることを示すニーモニック`j'が使えるようになっ
+ています（*Note char-syntax::）．
+
+さらにNemacsでは*char-syntax*を２バイト文字に拡張した*char-category*を定
+義しています．*char-category*は，２バイト文字（日本語文字コード体系に含
+まれる文字）を記号，英数字，ひらがな，特殊ひらがな，かたかな，特殊かたか
+な，ギリシャ文字，ロシア文字，未定義，漢字，特殊漢字の１１種類に分類しま
+す．（*Note char-category::．） この分類に基づいてNemacsは文節の疑似的な
+切り出しを行ないます．またこの分類に基づいて，正規表現が拡張および変更さ
+れています．
+
+関数:
+## Function: char-syntax CHAR
+     CHARのsyntaxコードを返す．
+## Function: char-category POS/STRING
+     位置POSの文字またはストリングSTRINGの最初の文字の，categoryコードを返す．
+     POSが領域外またはSTRINGがNULLの場合は`nil'を返す．
+
+
+File: nemacs  Node: char-syntax, Up: シンタックス, Next: char-category
+
+char-syntax
+...........
+
+Nemacsでは次のchar-syntaxが定義されています．
+
+syntaxのコード:
+`SPC'
+     whitespace syntax.
+`w'
+     word constituent.
+`_'
+     symbol constituent.
+`.'
+     punctuation.
+`('
+     open parenthesis.
+`)'
+     close parenthesis.
+`"'
+     string quote.
+`\'
+     character quote.
+`$'
+     paired delimiter.
+`''
+     expression prefix operator.
+`<'
+     comment starter.
+`>'
+     comment ender.
+`j'
+     first or second byte of Jcode
+
+
+File: nemacs  Node: char-category, Prev: char-syntax, Up: シンタックス, Next: 疑似文節
+
+char-category
+.............
+
+Nemacsでは，すべての（１バイトと２バイトの）文字に対してchar-categoryが
+定義されています．
+
+char-categoryのコード:
+１バイト文字の場合：
+`SPC'
+     whitespace syntax.
+`w'
+     word constituent.
+`_'
+     symbol constituent.
+`.'
+     punctuation.
+`('
+     open-parenthesis.
+`)'
+     close parenthesis.
+`"'
+     string quote.
+`\'
+     character quote.
+`$'
+     paired delimiter.
+`''
+     expression prefix operator.
+`<'
+     comment starter.
+`>'
+     comment ender.
+２バイト文字の場合：
+`s'
+     記号．漢字コードの区点が１、２、８区のもの．
+`a'
+     英数字．漢字コードの区点が３区のもの．
+`h'
+     ひらがな．漢字コードの区点が４区のもの．特殊ひらがなを除く．
+`H'
+     特殊ひらがな．"ヽ", "ヾ", "ゝ", "ゞ"
+`k'
+     かたかな．漢字コードの区点が５区のもの．特殊かたかなを除く．
+`K'
+     特殊かたかな．"ー"
+`g'
+     ギリシャ文字．漢字コードの区点が６区のもの．
+`r'
+     ロシア文字．漢字コードの区点が７区のもの．
+`u'
+     未定義．漢字コードの区点が９〜１５区のもの．
+`c'
+     漢字．漢字コードの区点が１６区以上のもの．特殊漢字を除く．
+`C'
+     特殊漢字． "仝", "々", "〆", "〇"
+
+
+File: nemacs  Node: 疑似文節, Prev: シンタックス, Up: 日本語文書編集機能, Next: 探索
+
+文節＝拡張word
+--------------
+
+Nemacsは１バイトコードを12のカテゴリに，日本語文字コード （２バイトコー
+ド）を11のカテゴリに分けています（*Note char-category::）． GNU Emacsで
+は「語」は，word constituentの並びとして定義されています．Nemacsでは，日
+本語文字コードについてこの定義を拡張し，次のようにしています．
+拡張ひらがな ::=
+     ( ひらがな | 特殊ひらがな )
+拡張かたかな ::=
+     ( かたかな | 特殊かたかな )
+拡張漢字 ::=
+     ( 漢字 | 特殊漢字 )
+拡張word  ::=
+     ( word
+     | ( 英数字 | 拡張ひらがな | 拡張カタカナ | ギリシャ文字
+     | ロシア文字 | 拡張漢字 )+ 拡張ひらがな )
+拡張カテゴリ ::=
+     ( 拡張ひらがな | 拡張かたかな |拡張漢字 )
+
+つまり，Nemacsは次のような文字のシーケンスを１つの拡張wordとみなします．
+  1. 連続するword constituents
+  2. 連続する同一の拡張カテゴリに属する日本語文字
+  3. 前項のものに１つ以上の拡張ひらがなが続いたもの
+
+この拡張wordは，日本語文中ではほぼ文節に対応し，１バイト文字シーケンス中
+ではwordと同じものです．
+
+
+File: nemacs  Node: 探索, Prev: 疑似文節, Up: 日本語文書編集機能, Next: 行詰めと行揃え
+
+日本語ストリングの探索と置換
+----------------------------
+
+日本語文書についても探索コマンド *search-forward*, *search-backward*,
+*isearch-forward*,*isearch-backward*,
+*re-search-forward*,*re-search-backward*,
+*isearch-forward-regexp*,*isearch-backward-regexp*や置換コマンド
+*replace-string*,*replace-regexp*を使うことができます．
+
+インクリメンタル探索(*isearch*)中にストリング入力を行なうには，`C-k'をタ
+イプして下さい．このモードではミニバッファ中で日本語ストリングの入力を行
+なうことができます．ストリング入力が終ったら，RETキイを押して下さい．
+Nemacsは*isearch*を再開します．
+
+探索や置換に用いる正規表現は，拡張wordやchar-categoryに対応して拡張およ
+び変更されています．
+
+* Menu:
+
+RegExp: 日本語正規表現. 
+
+
+File: nemacs  Node: 日本語正規表現, Prev: 探索, Up: 探索, Next: 行詰めと行揃え
+
+探索や置換に用いる正規表現は，拡張wordやchar-categoryに対応して次のよ
+うに拡張および変更されています．
+
+拡張：
+\cCATEGORY
+     char-category が CATEGORY の文字と合致する．
+\CCATEGORY
+     char-category が CATEGORY でない文字と合致する．
+\h
+     改行を除く１バイト文字１文字と合致する．
+\z
+     すべての２バイト文字１文字と合致する．
+[...]
+     各コードと等しい１バイトもしくは２バイト文字と合致する．
+normal code
+     それと等しい１バイトもしくは２バイト文字と合致する．
+変更：
+.
+     改行文字を除く１バイト文字１文字またはすべての２バイト文字１文字と
+     合致する．
+\w
+     拡張wordの構成要素の文字と合致する。すなわち１バイト文字の場合は 
+     syntax-table の char-syntax が "w" のもの、２バイト文字の場合は文字
+     の分類が英数字、拡張ひらがな、拡張カタカナ、ギリシャ文字、ロシア文
+     字、拡張漢字のものと合致する．
+     \(\sw\|\ca\|\ch|\cH\|\ck|\cK\|\cg\|\cr\|\cc|\cC\)と等価．
+\W
+     拡張wordの構成要素でない文字と合致する．
+\b
+     拡張wordの前後にある空の文字列と合致する．
+\B
+     拡張wordの前後にない空の文字列と合致する．
+\<
+     拡張wordの前にある空の文字列と合致する．
+\>
+     拡張wordの後にある空の文字列と合致する．
+
+注意: \sw (\Sw) は GNU Emacs では \w (\W) と等価ですが，Nemacsでは等価で
+はありません．\sw (\Sw) は拡張word ではなく word の構成要素（あるいはそ
+れ以外）とのみ合致します．
+
+
+File: nemacs  Node: 行詰めと行揃え, Prev: 探索, Up: 日本語文書編集機能, Next: 行詰め
+
+行詰めと行揃え
+--------------
+
+Nemacsは日本語文書についても行詰めと行揃えの機能を提供しています．
+
+* Menu:
+
+* Fill: 行詰め.	   日本語文書の行詰め
+* Justify: 行揃え. 日本語文書の行揃え
+
+
+File: nemacs  Node: 行詰め, Up: 行詰めと行揃え, Next: 行揃え
+
+行詰め
+......
+
+Nemacsは日本語文書についても，コマンド*fill-paragraph*による行詰めや，
+`auto-fill-mode'における自動行詰め機能を提供しています．
+
+日本語文書では，語の間にスペースはなく行は一定の長さで折り返されるのが普
+通です．しかし日本語文字のうちの一部の文字（ほとんど記号です）は行頭や行
+末に現れることができません．このような文字を正しく扱うために，Nemacsは行
+の長さを変えることがあります．日本語文書の行詰めはオリジナルのText
+Fillingの拡張として実現されているので，英文字単語中で行が終ることはあり
+ません．
+
+行頭及び行末禁則の一般規則は次のようになります．
+
+*行頭禁則文字*
+     文／句の終りを示す記号は行頭に現れない．このような記号としては句点
+     （、）読点（。）などがある．変数 `kinsoku-bol-chars' はこのような文
+     字のリストを保持する．
+*行末禁則文字*
+     文／句の始まりを示す記号は行末に現れない．このような記号としてはか
+     ぎ括弧開け（「），括弧開け（（）などがある．変数 
+     `kinsoku-eol-chars' はこのような文字のリストを保持する．
+
+Nemacsは，以下のどちらかの方法（禁則処理）を使って行の長さを変え，行頭行
+末禁則の規則を守ります．
+
+*ぶら下げ処理*
+     行の長さを１ないし複数文字分伸ばす．変数`kinsoku-nobashi-limit'が伸
+     ばし得る最大文字数を示します．
+*追いだし処理*
+     行の長さを１ないし複数文字分短くする．
+
+Nemacsは次の場合に限り追い出しを，それ以外の場合ぶら下げを行ないます．
+
+   * 禁則処理を行なわないと行末が行末禁則文字であり，その次の文字が行末禁則で
+     ない場合．
+   * 行末禁則文字が行末付近で続き，変数`kinsoku-nobashi-limit'で示される
+     以上にぶら下げる必要がある場合．
+
+変数：
+## Global Variable: kinsoku-bol-chars
+     行頭禁則文字のリスト．
+## Global Variable: kinsoku-eol-chars
+     行末禁則文字のリスト．
+## Global Variable: kinsoku-nobashi-limit
+     ぶら下げ処理によって伸ばし得る文字数（１バイト文字）の最大値．
+
+
+File: nemacs  Node: 行揃え, Prev: 行詰め, Up: 行詰めと行揃え, Next: 日本語処理のための拡張
+
+行揃え
+......
+
+Nemacsは日本語文書についても行揃えを提供しています．英文の場合には語の間
+の空白文字を増やすことによって行揃えが行なわれています．日本語の場合には
+語間には空白文字をいれてはならないので，句読点の後ろと alphanumerics と
+日本語文字の間に空白文字を挿入して行揃えを実現しています．
+
+
+
+File: nemacs  Node: 日本語処理のための拡張, Prev: 日本語文書編集機能, Up: 機能, Next: ピクチュアモード
+
+日本語処理のための拡張
+======================
+
+日本語処理を行なうために，ピクチュアモード，矩形領域処理，略称展開
+(dynamic abbreviation)の３点が拡張されています．
+
+* Menu:
+
+* PictureMode: ピクチュアモード.
+* Rectangle: 矩形領域の処理.
+* Abbrev: 動的な略称展開.
+
+
+File: nemacs  Node: ピクチュアモード, Prev: 日本語処理のための拡張, Up: 日本語処理のための拡張, Next: 矩形領域の処理
+
+ピクチュアモード
+----------------
+
+Nemacs におけるピクチュアモードはファイル`picture.el' へのパッチによって，
+文字の挿入方向，日本語入力の方法の２点が拡張されています．
+
+* Menu:
+
+* Direction:  文字の挿入方向の拡張.
+* InputInPic: 日本語入力.
+
+
+File: nemacs  Node: 文字の挿入方向の拡張, Prev: ピクチュアモード, Up: ピクチュアモード, Next: 日本語入力
+
+文字の挿入方向の拡張
+....................
+
+Emacsのピクチュアモードでは，１文字挿入された後のカーソルの移動方向を上
+下左右斜めに指定できます．斜めを指定した場合には，縦横各方向にそれぞれ１
+カラム（行）移動します．斜め指定の状態はモードライン上の`nw', `ne',
+`sw', `se' などのニーモニック表示で示されます．
+
+Nemacs では日本語文字は通常のアスキー文字の２倍の文字幅を持つので，上記
+に加え２カラムと１行斜めという指定が行なえるようになっています．指定状態
+は，`wnw', `ene', `wsw', `ese'
+のニーモニックで表示されます．
+
+`se' と `ese' 指定時のカーソルの移動は次のようになります．
+     s
+      e
+       指
+        定
+         時
+
+     s
+       e
+         s
+           指
+             定
+               時
+
+コマンド:
+## Command: picture-movement-wnw
+     `C-c ~'．挿入後，左へ２カラム，上へ１行移動する．
+## Command: picture-movement-ene
+     `C-c \'．挿入後，右へ２カラム，上へ１行移動する．
+## Command: picture-movement-wsw
+     `C-c ?'．挿入後，左へ２カラム，下へ１行移動する．
+## Command: picture-movement-ese
+     `C-c |'．挿入後，右へ２カラム，下へ１行移動する．
+
+
+File: nemacs  Node: 日本語入力, Prev: 文字の挿入方向の拡張, Up: ピクチュアモード, Next: 矩形領域の処理
+
+ピクチュアモードでの日本語入力
+..............................
+
+Emacs の pictureモードでは，通常の文字は全て*picture-self-insert* という
+コマンドに割り付けられています．Nemacs では「たまご」による日本語入力を
+行なうために，「たまご」 使用時には通常文字を全て
+*egg-self-insert-command* に割り付けます．「たまご」 が文字列を確定した
+後に呼ぶ*self-insert-after-hook* には*picture-insert-after-hook* が割り
+付けられ，この関数が文字列の入力処理を行ないます．
+
+EGG 以外の日本語入力方式 (SKK 等) を用いる場合は，関数
+`picture-insert-string' （`C-c k'）を実行し、ミニバッファから日本語文字
+列を読み込まなくてはなりません． 
+
+関数:
+## Function: picture-insert-after-hook BEGIN END
+     現在のバッファにストリングを挿入した後実行されるhook.
+     ２引数BEGINとENDは挿入したストリングの先頭と最後の位置を示す．
+
+コマンド:
+## Command: picture-insert-string STR
+     `picture-movement'コマンドによって指定された方向へポイントを移動させ
+     ながら，ストリングSTRの構成文字を一文字ずつ挿入する．
+
+
+File: nemacs  Node: 矩形領域の処理, Prev: ピクチュアモード, Up: 日本語処理のための拡張, Next: 動的な略称展開
+
+矩形領域の処理
+--------------
+
+矩形領域 (rectangle) の処理はファイル`rect.el' へのパッチによって拡
+張されています．
+
+GNU Emacs はバッファ内の矩形領域に対してさまざまな処理を行なう関数を持っ
+ています．しかしNemacs では 矩形領域の境界にまたがって日本語文字が存在す
+る可能性があります．これに対処するため，境界上の日本語文字はアスキーのス
+ペース２文字に置き換えた上で処理を行ないます．
+
+このため，
+     		        ↓
+     		これは rectangle の
+     		境界に,日本語文字が存
+     		在する場合の処理の例
+     		です。test test test
+     			     ↑
+
+上のような２点で指定された矩形領域に対して `kill-rectangle'を行なうと，
+
+     		        ↓
+     		これは rele の
+     		境界に,日 字が存
+     		在する場 理の例
+     		です。test test
+     			↑
+
+というように２行目の「文」と３行目の「合」の２文字が削除されます．また，
+`yank-rectangle' を行なっても，
+
+     		        ↓
+     		これは rectangle の
+     		境界に,日本語  字が存
+     		在する場  の処理の例
+     		です。test test test
+     			     ↑
+
+上記のようになり、元通りには復元しません．
+
+
+File: nemacs  Node: 動的な略称展開, Prev: 矩形領域の処理, Up: 日本語処理のための拡張, Next: その他
+
+動的な略称展開
+--------------
+
+ファイル`dabbrev.el' へのパッチによって，日本語についても動的略称展
+開(dynamic abbreviation)ができるようになっています．ワードの切り出しは
+拡張wordに従います．
+
+
+File: nemacs  Node: その他, Prev: 機能, Up: NemacsUsers, Next: ドキュメント
+
+Nemacs についていろいろ
+***********************
+* Menu:
+
+* Documents: ドキュメント.  ドキュメントの在処
+* Keymaps: キーマッピング.  キーマップの変更点
+
+
+File: nemacs  Node: ドキュメント, Up: その他, Next: キーマッピング
+
+Nemacs のドキュメント
+=====================
+Nemacsに関連するドキュメントは次のものが (NEMACS)/etc ディレクトリにあり
+ます．
+
+NEMACS.tut
+     日本語 Nemacs チュートリアル． `C-h T'
+     (`help-with-tutorial-for-nemacs')で読むことができます．英語版は 
+     `C-h t'で起動されます．
+NEMACS.log
+     Nemacs Ver.3.2.以降の変更．
+
+以下のマニュアルは (NEMACS)/man ディレクトリにあります．
+
+nemacs.texinfo
+     このinfoのソースファイル．
+egg.texinfo
+     "EGG"システム用infoのソースファイル．
+
+
+File: nemacs  Node: キーマッピング, Prev: ドキュメント, Up: その他, Next: コマンド一覧
+
+キーマッピングの変更
+====================
+
+Nemacs は`M-$'を `esc-dol-map'に， `M-('を`esc-par-map' にそれぞれ割り付
+けています．
+
+     (define-key esc-map "$" esc-dol-map)
+     (define-key esc-map "(" esc-par-map)
+     (define-key esc-dol-map "@" 'kanji-jis-start)
+     (define-key esc-dol-map "B" 'kanji-jis-start)
+     (define-key esc-par-map "B" 'kanji-jis-end)
+     (define-key esc-par-map "H" 'kanji-jis-end)
+     (define-key esc-par-map "J" 'kanji-jis-end)
+
+したがって，オリジナルGNU Emacsで`M-$'あるいは `M-('が割り付けられていた
+以下の関数については新たなキーが定義されています．
+
+     (define-key esc-map "#" 'spell-word)
+     (define-key esc-map "{" 'insert-parentheses)
+
+キーボード入力としてJISコードを受け付ける場合には，Nemacsは関数
+`kanji-jis-start' と関数 `kanji-jis-end'を呼びます．JISコードを
+使用する場合にはこれらのキーマップを変えてはいけません．
+
+
+
+File: nemacs  Node: NemacsLispers, Up: Top, Next: マーカの拡張
+
+NemacsLisp
+**********
+
+EmacsLispに関していくつかの拡張がなされています．
+
+* Menu:
+
+* Marker: マーカの拡張.
+* Attribute: 属性の付与.
+
+
+File: nemacs  Node: マーカの拡張, Up: NemacsLispers, Next: 属性の付与
+
+マーカの拡張
+============
+
+Nemacsでは`point-type'という新しいタイプのマーカを提供しています．このタ
+イプのマーカの位置への挿入は，そのマーカをポイントのように挿入されたスト
+リングの直後に移動します．先頭にオリジナルのマーカ，最後尾にこの新しいマー
+カをおくことで設定される領域は，領域の全ストリングの削除や最後尾へのスト
+リングの挿入などについて特別な配慮を必要としません．
+
+コマンド:
+## Command: set-marker-type MARKER POINT-TYPE
+     POINT-TYPEがNILでなければ，マーカMARKERのタイプを`point-type'に設定する．
+     NILならばオリジナルのタイプに設定する．MARKERを返す．
+
+関数:
+## Function: insert-after-markers STRING/CHAR
+     引数としてストリングか文字（いくつでも）をとる．ストリング／文字（たち）
+     をポイントの後ろに挿入し，挿入位置を指している`point-type'のマーカを挿入
+     されたテキストの直前に移動する．
+
+
+File: nemacs  Node: 属性の付与, Prev: マーカの拡張, Up: NemacsLispers
+
+属性の付与
+==========
+バッファ中の領域について，表示に関する属性を与えることができます．属性は
+X-Window上でのみ有効です．現在提供されている属性は下線と反転です．
+
+関数:
+## Command: attribute-on-region ATTR &optional FROM TO
+     領域内の属性ATTRをonにする．ATTRは'underline'または'inverse'．
+     プログラムから呼ぶ場合はさらに２引数FROMとTOをとる．FROMがNILの場合には
+     (point-min)，TOがNILの場合には(point-max)が用いられる．
+## Command: attribute-off-region ATTR &optional FROM TO
+     領域内の属性ATTRをoffにする．ATTRは'underline'または'inverse'．
+## Function: attribute-get-attribute &optional POS
+     位置POSのattribute rangeを返す．POSのデフォルト値はカレントポイント．
+     attribute rangeは，attribute type，その始点，終点のリスト．
+
+
+
+File: nemacs  Node: コマンド一覧, Up: NemacsUsers, Next: 概念索引
+
+コマンドカード
+**************
+
+*チュートリアル*
+日本語版チュートリアルを起動
+     `C-h T'
+
+*日本語文字モードの設定*
+日本語文字モード⇔alphanumericsモードの切替え
+     `C-x C-k t'
+日本語文字モード⇔alphanumericsモードのデフォルト値の切替え
+     `C-x C-k T'
+
+*使用する日本語文字コード体系の設定*
+キーボード漢字コードの設定
+     `M-x set-kanji-input-code'
+キーボード漢字コードの切替え
+     `C-x C-k i'
+ディスプレイ漢字コードの設定
+     `M-x set-kanji-displkay-code'
+ディスプレイ漢字コードの切替え
+     `C-x C-k d'
+ファイル漢字コードの設定
+     `M-x set-kanji-fileio-code'
+ファイル漢字コードの切替え
+     `C-x C-k f'
+ファイル読み込み時のファイル漢字コードの一時的切替え
+     `C-u'N`C-x C-f'
+プロセス漢字コードの設定
+     `M-x set-process-kanji-code'
+プロセス漢字コードの切替え
+     `C-x C-k p'
+選択されているコード体系を表示
+     `C-x C-k C'または`C-x C-k c'
+ファイル漢字コードのデフォルト値の切替え
+     `C-x C-k F'
+プロセス漢字コードのデフォルト値の切替え
+     `C-x C-k P'
+
+*インクリメンタル探索*
+ストリング入力
+     （`C-s',`C-r'などの後）`C-k'STRINGRET
+
+*ピクチュアモード*
+左へ２カラム，上へ１行カーソル移動
+     `C-c ~'
+右へ２カラム，上へ１行カーソル移動
+     `C-c \'
+左へ２カラム，下へ１行カーソル移動
+     `C-c ?'
+右へ２カラム，下へ１行カーソル移動
+     `C-c |'
+
+*変更*
+ポイントのある単語の綴りチェック
+     `M-#'
+かっこの挿入
+     `M-{'
+
+
+File: nemacs  Node: 概念索引, Prev: コマンド一覧, Up: Top, Next: 関数・変数索引
+
+概念索引
+********
+
+
+* Menu:
+
+* EUC コード: 日本語文字コード体系.
+* JIS コード: 日本語文字コード体系.
+* Nemacs: 概説.
+* alphanumerics: バッファ管理.
+* char-category: char-category.
+* char-syntax: char-syntax.
+* character quote: char-syntax.
+* close parenthesis: char-syntax.
+* comment ender: char-syntax.
+* comment starter: char-syntax.
+* expression prefix operator: char-syntax.
+* find file: 漢字ファイルの読み込み.
+* first or second byte of a Japanese character: char-syntax.
+* key maps: キーマッピング.
+* open parenthesis: char-syntax.
+* paired delimiter: char-syntax.
+* punctuation: char-syntax.
+* string quote: char-syntax.
+* symbol constituent: char-syntax.
+* whitespace syntax: char-syntax.
+* word constituent: char-syntax.
+* 英数字: char-category.
+* 追いだし処理: 行詰め.
+* 拡張word: 疑似文節.
+* 下線: 属性の付与.
+* かたかな: char-category.
+* かたかな: 日本語正書法.
+* かな: 日本語正書法.
+* 漢字: char-category.
+* 漢字: 日本語正書法.
+* 漢字: 日本語文字コード.
+* 漢字コード: 日本語文字コード体系.
+* 外部プロセス: プロセス間通信.
+* キーボード漢字コード: 日本語文字コード.
+* キーボード入力: キーボード入力.
+* 記号: char-category.
+* 禁則: 行詰め.
+* 疑似文節: 疑似文節.
+* 行揃え: 行揃え.
+* 行詰め: 行詰め.
+* ギリシャ文字: char-category.
+* 矩形領域: 矩形領域の処理.
+* コード変換コマンド: 日本語文字コードを扱う関数.
+* 語: 疑似文節.
+* サーバプロセス: プロセス間通信.
+* シフトJIS コード: 日本語文字コード体系.
+* 正規表現: 日本語正規表現.
+* 探索: 探索.
+* 置換: 探索.
+* ディスプレイ漢字コード : 日本語文字コード.
+* ディスプレイ表示 : ディスプレイ表示.
+* 特殊かたかな: char-category.
+* 特殊漢字: char-category.
+* 特殊ひらがな: char-category.
+* ドキュメント: ドキュメント.
+* 日本語: 機能.
+* 日本語処理: 機能.
+* 日本語正書法: 日本語正書法.
+* 日本語文書編集機能: 日本語文書編集機能.
+* 日本語文字コード: 日本語文字コード体系.
+* 日本語文字コード変換: 日本語文字コードを扱う関数.
+* 反転: 属性の付与.
+* バッファ: バッファ管理.
+* バッファ漢字コード: 日本語文字コード.
+* バッファ生成: バッファ生成.
+* バッファ内部表現: 内部表現.
+* 表示: ディスプレイ表示.
+* ひらがな: char-category.
+* ひらがな: 日本語正書法.
+* ピクチュアモード: ピクチュアモード.
+* ファイル漢字コード: ファイル入力.
+* ファイル漢字コード: 日本語文字コード.
+* ファイル出力: ファイル出力.
+* ファイル挿入: ファイルの挿入.
+* ファイル入出力: ファイル入出力.
+* ファイル入力: ファイル入力.
+* フォント: ディスプレイ表示.
+* ぶら下げ処理: 行詰め.
+* 文節: 日本語正書法.
+* プロセス漢字コード: プロセス間通信.
+* プロセス漢字コード: 日本語文字コード.
+* プロセス間通信: プロセスについてもっと.
+* プロセス間通信: プロセス間通信.
+* マーカ: マーカの拡張.
+* 未定義: char-category.
+* モードライン: バッファ生成.
+* ロシア文字: char-category.
+
+
+File: nemacs  Node: 関数・変数索引, Up: Top, Next: 概念索引
+
+関数・変数索引
+**************
+
+
+* Menu:
+
+* attribute-get-attribute: 属性の付与.
+* attribute-off-region: 属性の付与.
+* attribute-on-region: 属性の付与.
+* call-process: プロセス間通信.
+* call-process-region: プロセス間通信.
+* change-default-fileio-code: ファイル入出力.
+* change-default-process-code: プロセス間通信.
+* change-display-code: ディスプレイ表示.
+* change-fileio-code: ファイル入出力.
+* change-input-code: キーボード入力.
+* change-process-code: プロセス間通信.
+* char-category: シンタックス.
+* char-syntax: シンタックス.
+* check-region-kanji-code: 日本語文字コードを扱う関数.
+* check-string-kanji-code: 日本語文字コードを扱う関数.
+* convert-region-kanji-code: 日本語文字コードを扱う関数.
+* convert-string-kanji-code: 日本語文字コードを扱う関数.
+* define-program-kanji-code: プロセスについてもっと.
+* define-service-kanji-code: プロセスについてもっと.
+* egg-self-insert-command: 日本語入力.
+* fill-paragrap: 行詰め.
+* find-alternate-file: 漢字ファイルの読み込み.
+* find-file: 漢字ファイルの読み込み.
+* find-file-other-window: 漢字ファイルの読み込み.
+* find-kanji-process-code: プロセスについてもっと.
+* help-with-tutorial-for-nemacs: 概説.
+* insert-after-markers: マーカの拡張.
+* isearch: 探索.
+* isearch-backward: 探索.
+* isearch-backward-regexp: 探索.
+* isearch-forward: 探索.
+* isearch-forward-regexp: 探索.
+* jcode-type: 日本語文字コードを扱う関数.
+* jis-code-input: キーボード入力.
+* kanji-char-after: 日本語文字コードを扱う関数.
+* kanji-delete-region: 日本語文字コードを扱う関数.
+* kanji-jis-end: キーボード入力.
+* kanji-jis-start: キーボード入力.
+* list-kanji-code: 日本語文字コード体系.
+* list-kanji-code-briefly: 日本語文字コード体系.
+* nemacs-version: 概説.
+* open-network-stream: プロセス間通信.
+* picture-insert-after-hook: 日本語入力.
+* picture-insert-string: 日本語入力.
+* picture-movement-ene: 文字の挿入方向の拡張.
+* picture-movement-ese: 文字の挿入方向の拡張.
+* picture-movement-wnw: 文字の挿入方向の拡張.
+* picture-movement-wsw: 文字の挿入方向の拡張.
+* process-kanji-code: プロセス間通信.
+* re-search-backward: 探索.
+* re-search-forward: 探索.
+* replace-regexp: 探索.
+* replace-string: 探索.
+* search-backward: 探索.
+* search-forward: 探索.
+* self-insert-after-hook: 日本語入力.
+* set-default-fileio-code: ファイル入出力.
+* set-default-kanji-process-code: プロセス間通信.
+* set-kanji-display-code: ディスプレイ表示.
+* set-kanji-expected-code: ファイルの挿入.
+* set-kanji-expected-code: 漢字ファイルの読み込み.
+* set-kanji-fileio-code: ファイルの挿入.
+* set-kanji-fileio-code: ファイル入出力.
+* set-kanji-input-code: キーボード入力.
+* set-marker-type: マーカの拡張.
+* set-process-kanji-code: プロセス間通信.
+* start-process: プロセス間通信.
+* toggle-default-kanji-flag: 日本語文字コード.
+* toggle-kanji-flag: 日本語文字コード.
+* view-nemacs-news: 概説.
+* x-set-kfont: ディスプレイ表示.
+
+
+Tag table:
+Node: Top99
+Node: NemacsUsers302
+Node: 概説1703
+Node: 日本語文字コード2874
+Node: 日本語文字コード体系4824
+Node: バッファ管理6361
+Node: 内部表現6908
+Node: バッファ生成7332
+Node: キーボード入力8559
+Node: ディスプレイ表示10649
+Node: ファイル入出力12336
+Node: ファイル入力15566
+Node: ファイルの挿入17230
+Node: 漢字ファイルの読み込み19144
+Node: 新規ファイル作成時20680
+Node: ファイル出力21362
+Node: プロセス間通信22151
+Node: プロセスについてもっと25773
+Node: 機能28144
+Node: 日本語文字コードを扱う関数28501
+Node: 日本語文書編集機能30699
+Node: 日本語正書法31627
+Node: シンタックス32472
+Node: char-syntax33548
+Node: char-category34076
+Node: 疑似文節35266
+Node: 探索36308
+Node: 日本語正規表現37107
+Node: 行詰めと行揃え38498
+Node: 行詰め38771
+Node: 行揃え40601
+Node: 日本語処理のための拡張40989
+Node: ピクチュアモード41357
+Node: 文字の挿入方向の拡張41719
+Node: 日本語入力42887
+Node: 矩形領域の処理43974
+Node: 動的な略称展開45120
+Node: その他45414
+Node: ドキュメント45645
+Node: キーマッピング46200
+Node: NemacsLispers47159
+Node: マーカの拡張47358
+Node: 属性の付与48248
+Node: コマンド一覧49069
+Node: 概念索引50480
+Node: 関数・変数索引53237
+
+End tag table

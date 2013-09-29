@@ -1,0 +1,98 @@
+
+(defvar sun-rkeymap (make-keymap))
+
+(fset (quote sun-rprefix) sun-rkeymap)
+
+(define-key global-map "O" (quote sun-rprefix))
+
+(define-key sun-rkeymap "A" (quote previous-line))
+
+(define-key sun-rkeymap "B" (quote next-line))
+
+(define-key sun-rkeymap "C" (quote forward-char))
+
+(define-key sun-rkeymap "D" (quote backward-char))
+
+(defvar sun-fkeymap (make-keymap))
+
+(fset (quote sun-fprefix) sun-fkeymap)
+
+(define-key global-map "[" (quote sun-fprefix))
+
+(define-key sun-fkeymap "[" (quote backward-paragraph))
+
+(define-key sun-fkeymap "11~" (quote change-fileio-code))
+
+(define-key sun-fkeymap "12~" (quote edit-dict-item))
+
+(define-key sun-fkeymap "13~" (quote jis-code-input))
+
+(define-key sun-fkeymap "14~" (quote toroku-region))
+
+(define-key sun-fkeymap "15~" (quote zenkaku-region))
+
+(define-key sun-fkeymap "17~" (quote hankaku-region))
+
+(define-key sun-fkeymap "18~" (quote katakana-region))
+
+(define-key sun-fkeymap "19~" (quote hiragana-region))
+
+(define-key sun-fkeymap "20~" (quote henkan-region))
+
+(define-key sun-fkeymap "23~" (quote insert-buffer))
+
+(define-key sun-fkeymap "24~" (quote insert-file))
+
+(define-key sun-fkeymap "25~" (quote eval-region))
+
+(define-key sun-fkeymap "26~" (quote eval-current-buffer))
+
+(define-key sun-fkeymap "28~" (quote enlarge-window))
+
+(define-key sun-fkeymap "29~" (quote shrink-window))
+
+(define-key sun-fkeymap "31~" (quote revert-buffer))
+
+(define-key sun-fkeymap "32~" (quote revert-buffer))
+
+(define-key sun-fkeymap "33~" (quote beginning-of-buffer))
+
+(define-key sun-fkeymap "34~" (quote end-of-buffer))
+
+(define-key sun-fkeymap "192z" (quote insert-buffer))
+
+(define-key sun-fkeymap "193z" (quote insert-file))
+
+(define-key sun-fkeymap "194z" (quote eval-region))
+
+(define-key sun-fkeymap "195z" (quote eval-current-buffer))
+
+(define-key sun-fkeymap "196z" (quote enlarge-window))
+
+(define-key sun-fkeymap "197z" (quote shrink-window))
+
+(define-key sun-fkeymap "198z" (quote revert-buffer))
+
+(define-key sun-fkeymap "199z" (quote revert-buffer))
+
+(define-key sun-fkeymap "200z" (quote beginning-of-buffer))
+
+(define-key sun-fkeymap "201z" (quote end-of-buffer))
+
+(define-key sun-fkeymap "224z" (quote change-fileio-code))
+
+(define-key sun-fkeymap "225z" (quote edit-dict-item))
+
+(define-key sun-fkeymap "226z" (quote jis-code-input))
+
+(define-key sun-fkeymap "227z" (quote toroku-region))
+
+(define-key sun-fkeymap "228z" (quote zenkaku-region))
+
+(define-key sun-fkeymap "229z" (quote hankaku-region))
+
+(define-key sun-fkeymap "230z" (quote katakana-region))
+
+(define-key sun-fkeymap "231z" (quote hiragana-region))
+
+(define-key sun-fkeymap "232z" (quote henkan-region))
